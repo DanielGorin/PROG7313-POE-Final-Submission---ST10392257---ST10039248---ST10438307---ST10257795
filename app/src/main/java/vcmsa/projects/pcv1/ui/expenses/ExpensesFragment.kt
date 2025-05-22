@@ -6,7 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import vcmsa.projects.pcv1.R
+import vcmsa.projects.pcv1.databinding.FragmentExpensesBinding
+import vcmsa.projects.pcv1.ui.expenses.ExpensesViewModel
 
 class ExpensesFragment : Fragment() {
 
@@ -16,16 +20,32 @@ class ExpensesFragment : Fragment() {
 
     private val viewModel: ExpensesViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private var _binding: FragmentExpensesBinding? = null
 
-        // TODO: Use the ViewModel
-    }
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_expenses, container, false)
+        val expensesViewModel =
+            ViewModelProvider(this).get(ExpensesViewModel::class.java)
+
+        _binding = FragmentExpensesBinding.inflate(inflater, container, false)
+        val root: View = binding.root
+
+        val textView: TextView = binding.textExpenses
+        expensesViewModel.text.observe(viewLifecycleOwner) {
+            textView.text = it
+        }
+        return root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

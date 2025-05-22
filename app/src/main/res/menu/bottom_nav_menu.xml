@@ -13,12 +13,12 @@
 
     <item
         android:id="@+id/navigation_notifications"
-        android:icon="@drawable/ic_budget_24"
+        android:icon="@drawable/ic_expense_24"
         android:title="@string/title_notifications" />
 
     <item
         android:id="@+id/navigation_expenses"
-        android:icon="@drawable/ic_expense_24"
+        android:icon="@drawable/ic_budget_24"
         android:title="@string/title_expenses" />
 
     <item
