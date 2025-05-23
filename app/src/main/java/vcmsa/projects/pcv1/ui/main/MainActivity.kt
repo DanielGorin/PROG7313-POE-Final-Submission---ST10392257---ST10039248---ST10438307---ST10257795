@@ -7,6 +7,7 @@ import androidx.navigation.ui.setupWithNavController
 import vcmsa.projects.pcv1.R.id.mobile_navigation
 import vcmsa.projects.pcv1.R.id.nav_host_fragment_activity_main
 import vcmsa.projects.pcv1.databinding.ActivityMainBinding
+import vcmsa.projects.pcv1.util.DarkModeManager
 import vcmsa.projects.pcv1.util.SessionManager
 
 class MainActivity : AppCompatActivity() {
@@ -19,6 +20,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         session = SessionManager(this)
+        DarkModeManager.setDarkMode(applicationContext, DarkModeManager.isDarkModeEnabled(applicationContext))
+
 
         if (!session.isLoggedIn()) {
             finish() // or redirect to login

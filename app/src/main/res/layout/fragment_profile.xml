@@ -10,17 +10,35 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal">
 
-        <!-- Profile Picture with Initial Fallback -->
-        <ImageView
-            android:id="@+id/image_profile"
+        <!-- Profile Picture Container -->
+        <FrameLayout
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/ic_account_circle_24"
-            android:background="@drawable/baseline_circle_24"
-            android:contentDescription="@string/profile_picture"
-            android:scaleType="centerCrop" />
+            android:layout_marginTop="16dp"
+            android:background="@drawable/circle_background">
 
-        <!-- Username Text -->
+            <!-- Profile Picture -->
+            <ImageView
+                android:id="@+id/image_profile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/profile_picture"
+                android:visibility="gone" />
+
+            <!-- Fallback Initial -->
+            <TextView
+                android:id="@+id/text_profile_initial"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="36sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:background="@android:color/transparent" />
+        </FrameLayout>
+
+        <!-- Username -->
         <TextView
             android:id="@+id/text_username"
             android:layout_width="wrap_content"

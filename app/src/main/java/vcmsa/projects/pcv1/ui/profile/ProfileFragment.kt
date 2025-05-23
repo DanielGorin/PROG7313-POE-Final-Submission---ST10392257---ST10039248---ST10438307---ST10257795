@@ -10,6 +10,7 @@ import vcmsa.projects.pcv1.databinding.FragmentProfileBinding
 import vcmsa.projects.pcv1.ui.auth.LandingActivity
 import vcmsa.projects.pcv1.util.SessionManager
 import vcmsa.projects.pcv1.ui.auth.LoginActivity // Change this if your login activity is named differently
+import vcmsa.projects.pcv1.util.DarkModeManager
 
 class ProfileFragment : Fragment() {
 
@@ -24,16 +25,29 @@ class ProfileFragment : Fragment() {
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         session = SessionManager(requireContext())
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.btnLogout.setOnClickListener {
             session.clear()
-            val intent = Intent(requireContext(), LandingActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            val intent = Intent(requireContext(), LandingActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
             startActivity(intent)
         }
 
-        return binding.root
+        // Set switch to current theme
+        binding.switchDarkMode.isChecked = DarkModeManager.isDarkModeEnabled(requireContext())
+
+        // Toggle dark mode on change
+        binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
+            DarkModeManager.setDarkMode(requireContext(), isChecked)
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
