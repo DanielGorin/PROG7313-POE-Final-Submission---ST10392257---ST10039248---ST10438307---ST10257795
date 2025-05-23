@@ -24,9 +24,9 @@
                 android:id="@+id/image_profile"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
                 android:contentDescription="@string/profile_picture"
-                android:visibility="gone" />
+                android:scaleType="centerCrop"
+                android:visibility="visible" />
 
             <!-- Fallback Initial -->
             <TextView
