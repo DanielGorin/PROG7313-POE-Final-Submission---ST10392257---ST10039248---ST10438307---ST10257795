@@ -15,7 +15,9 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="16dp"
-            android:background="@drawable/circle_background">
+            android:background="@drawable/circle_background"
+            android:clickable="true"
+            android:focusable="true">
 
             <!-- Profile Picture -->
             <ImageView
@@ -35,7 +37,7 @@
                 android:textSize="36sp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
-                android:background="@android:color/transparent" />
+                android:text="A" />
         </FrameLayout>
 
         <!-- Username -->

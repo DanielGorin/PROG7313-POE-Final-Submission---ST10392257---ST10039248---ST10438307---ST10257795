@@ -31,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 repo.login(username, password).onSuccess { user ->
                     session.saveUserId(user.id)
+                    session.saveUsername(user.username)
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finishAffinity()
                 }.onFailure {
