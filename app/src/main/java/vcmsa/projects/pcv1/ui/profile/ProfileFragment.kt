@@ -1,6 +1,5 @@
 package vcmsa.projects.pcv1.ui.profile
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,27 +8,46 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import vcmsa.projects.pcv1.R
+import vcmsa.projects.pcv1.data.AppDatabase
+import vcmsa.projects.pcv1.data.UserRepository
 import vcmsa.projects.pcv1.databinding.FragmentProfileBinding
 import vcmsa.projects.pcv1.ui.auth.LandingActivity
-import vcmsa.projects.pcv1.util.SessionManager
 import vcmsa.projects.pcv1.util.DarkModeManager
+import vcmsa.projects.pcv1.util.SessionManager
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var session: SessionManager
+    private lateinit var repo: UserRepository
+    private var currentUserId: Int = -1
+
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
-        if (uri != null) {
-            binding.imageProfile.setImageURI(uri)
+        uri?.let {
+            try {
+                // Request persistent URI permission
+                requireContext().contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: SecurityException) {
+                // ignore if permission not needed or already granted
+            }
+
+            binding.imageProfile.setImageURI(it)
             binding.textProfileInitial.visibility = View.GONE
-            saveProfileImageUri(requireContext(), uri)
+
+            lifecycleScope.launch {
+                repo.updateProfileImage(currentUserId, it.toString())
+            }
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,39 +56,34 @@ class ProfileFragment : Fragment() {
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         session = SessionManager(requireContext())
-
+        currentUserId = session.getUserId()
+        repo = UserRepository(AppDatabase.getInstance(requireContext()).userDao())
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Fetch username from session or placeholder
         val username = session.getUsername() ?: "User"
         binding.textUsername.text = username
 
-        // Load image or show initial
-        val profileImageUri = getProfileImageUri(requireContext()) // Replace with actual implementation
-        if (profileImageUri != null) {
-            try {
-                val inputStream = requireContext().contentResolver.openInputStream(profileImageUri)
-                inputStream?.close() // Test if the file is accessible
-
-                binding.imageProfile.setImageURI(profileImageUri)
-                binding.textProfileInitial.visibility = View.GONE
-            } catch (e: Exception) {
-                // URI invalid or file removed
-                binding.imageProfile.setImageResource(R.drawable.circle_background)
-                binding.textProfileInitial.text = username.firstOrNull()?.uppercase() ?: "?"
-                binding.textProfileInitial.visibility = View.VISIBLE
+        lifecycleScope.launch {
+            val uriString = repo.getProfileImage(currentUserId)
+            if (!uriString.isNullOrEmpty()) {
+                try {
+                    val uri = Uri.parse(uriString)
+                    val inputStream = requireContext().contentResolver.openInputStream(uri)
+                    inputStream?.close() // Validate URI access
+                    binding.imageProfile.setImageURI(uri)
+                    binding.textProfileInitial.visibility = View.GONE
+                } catch (e: Exception) {
+                    setFallbackImage(username)
+                }
+            } else {
+                setFallbackImage(username)
             }
-        } else {
-            binding.imageProfile.setImageResource(R.drawable.circle_background)
-            binding.textProfileInitial.text = username.firstOrNull()?.uppercase() ?: "?"
-            binding.textProfileInitial.visibility = View.VISIBLE
         }
 
-        // Profile image click (future image picker)
         binding.imageProfile.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
@@ -83,32 +96,20 @@ class ProfileFragment : Fragment() {
             startActivity(intent)
         }
 
-        // Dark mode toggle
         binding.switchDarkMode.isChecked = DarkModeManager.isDarkModeEnabled(requireContext())
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
             DarkModeManager.setDarkMode(requireContext(), isChecked)
         }
+    }
 
-        // TODO: Add handlers for btn_edit_profile, btn_change_password, etc.
+    private fun setFallbackImage(username: String) {
+        binding.imageProfile.setImageResource(R.drawable.circle_background)
+        binding.textProfileInitial.text = username.firstOrNull()?.uppercase() ?: "?"
+        binding.textProfileInitial.visibility = View.VISIBLE
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    fun clearProfileImageUri(context: Context) {
-        context.getSharedPreferences("profile", Context.MODE_PRIVATE)
-            .edit().remove("profile_image_uri").apply()
-    }
-
-    fun saveProfileImageUri(context: Context, uri: android.net.Uri) {
-        context.getSharedPreferences("profile", Context.MODE_PRIVATE)
-            .edit().putString("profile_image_uri", uri.toString()).apply()
-    }
-    // Stub function (replace with actual saved image logic)
-    private fun getProfileImageUri(context: android.content.Context): Uri? {
-        // Return a saved URI if you persist it (e.g., SharedPreferences)
-        return null
     }
 }

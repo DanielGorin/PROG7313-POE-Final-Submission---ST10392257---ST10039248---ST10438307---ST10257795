@@ -11,4 +11,13 @@ interface UserDao {
 
     @Insert
     suspend fun insertUser(user: User)
+
+    @Query("UPDATE users SET profile_image_uri = :uri WHERE id = :userId")
+    suspend fun updateProfileImage(userId: Int, uri: String?)
+
+    @Query("SELECT * FROM users WHERE id = :id")
+    suspend fun getUserById(id: Int): User?
+
+    @Query("SELECT profile_image_uri FROM users WHERE id = :userId")
+    suspend fun getProfileImageUri(userId: Int): String?
 }

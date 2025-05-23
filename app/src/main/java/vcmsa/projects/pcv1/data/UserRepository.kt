@@ -30,4 +30,18 @@ class UserRepository(private val userDao: UserDao) {
             }
             Result.success(user)
         }
+
+    suspend fun updateProfileImage(userId: Int, uri: String?) = withContext(Dispatchers.IO) {
+        userDao.updateProfileImage(userId, uri)
+    }
+
+    suspend fun getUserById(userId: Int): User? = withContext(Dispatchers.IO) {
+        userDao.getUserById(userId)
+    }
+
+    suspend fun getProfileImage(userId: Int): String? {
+        return userDao.getProfileImageUri(userId)
+    }
+
+
 }
