@@ -1,43 +1,38 @@
 package vcmsa.projects.pcv1.ui.profile
 
-import androidx.fragment.app.viewModels
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
-import vcmsa.projects.pcv1.R
-import vcmsa.projects.pcv1.databinding.FragmentDashboardBinding
-import vcmsa.projects.pcv1.databinding.FragmentExpensesBinding
 import vcmsa.projects.pcv1.databinding.FragmentProfileBinding
-import vcmsa.projects.pcv1.ui.dashboard.DashboardViewModel
+import vcmsa.projects.pcv1.ui.auth.LandingActivity
+import vcmsa.projects.pcv1.util.SessionManager
+import vcmsa.projects.pcv1.ui.auth.LoginActivity // Change this if your login activity is named differently
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var session: SessionManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val dashboardViewModel =
-            ViewModelProvider(this).get(DashboardViewModel::class.java)
-
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        session = SessionManager(requireContext())
 
-        val textView: TextView = binding.textProfile
-        dashboardViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        binding.btnLogout.setOnClickListener {
+            session.clear()
+            val intent = Intent(requireContext(), LandingActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
         }
-        return root
+
+        return binding.root
     }
 
     override fun onDestroyView() {
