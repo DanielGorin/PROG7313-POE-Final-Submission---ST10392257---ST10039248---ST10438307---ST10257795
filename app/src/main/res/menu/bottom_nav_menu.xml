@@ -7,14 +7,14 @@
         android:title="@string/title_home" />
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_category"
         android:icon="@drawable/ic_all_inbox_24"
-        android:title="@string/title_dashboard" />
+        android:title="@string/title_category" />
 
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_budget"
         android:icon="@drawable/ic_expense_24"
-        android:title="@string/title_notifications" />
+        android:title="@string/title_budget" />
 
     <item
         android:id="@+id/navigation_expenses"

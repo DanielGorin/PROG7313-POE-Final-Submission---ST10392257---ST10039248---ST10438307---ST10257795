@@ -12,16 +12,16 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="vcmsa.projects.pcv1.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_category"
+        android:name="vcmsa.projects.pcv1.ui.category.CategoryFragment"
+        android:label="@string/title_category"
+        tools:layout="@layout/fragment_category" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="vcmsa.projects.pcv1.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_budget"
+        android:name="vcmsa.projects.pcv1.ui.budget.BudgetFragment"
+        android:label="@string/title_budget"
+        tools:layout="@layout/fragment_budget" />
 
     <fragment
         android:id="@+id/navigation_expenses"
