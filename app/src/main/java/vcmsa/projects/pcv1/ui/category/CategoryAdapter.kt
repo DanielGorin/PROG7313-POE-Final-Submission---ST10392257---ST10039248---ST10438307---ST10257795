@@ -8,7 +8,8 @@ import vcmsa.projects.pcv1.data.Category
 
 class CategoryAdapter(
     private val onEdit: (Category) -> Unit,
-    private val onDelete: (Category) -> Unit
+    private val onDelete: (Category) -> Unit,
+    private val onClick: (Category) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     private var categories = listOf<Category>()
@@ -31,6 +32,7 @@ class CategoryAdapter(
 
             btnEdit.setOnClickListener { onEdit(category) }
             btnDelete.setOnClickListener { onDelete(category) }
+            root.setOnClickListener { onClick(category) }
         }
     }
 
@@ -40,4 +42,9 @@ class CategoryAdapter(
         categories = newList
         notifyDataSetChanged()
     }
+
+    fun getItemAt(position: Int): Category {
+        return categories[position]
+    }
+
 }
