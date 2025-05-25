@@ -1,22 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/budgetScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.budget.BudgetFragment">
+    android:padding="16dp">
 
-    <TextView
-        android:id="@+id/text_notifications"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_marginTop="50dp">
+
+        <TextView
+            android:text="Minimum Monthly Budget"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/editMinBudget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="e.g. 500.00" />
+
+        <TextView
+            android:text="Maximum Monthly Budget"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/editMaxBudget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="e.g. 2000.00" />
+
+        <Button
+            android:id="@+id/btnSaveBudget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Budget"
+            android:layout_marginTop="24dp"/>
+    </LinearLayout>
+</ScrollView>
