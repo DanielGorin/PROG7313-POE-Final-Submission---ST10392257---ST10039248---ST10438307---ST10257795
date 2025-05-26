@@ -1,47 +1,66 @@
 package vcmsa.projects.pcv1.ui.expenses
 
-import androidx.fragment.app.viewModels
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.launch
 import vcmsa.projects.pcv1.R
+import vcmsa.projects.pcv1.data.AppDatabase
+import vcmsa.projects.pcv1.data.ExpenseRepository
+//import vcmsa.projects.pcv1.databinding.FragmentExpenseBinding
 import vcmsa.projects.pcv1.databinding.FragmentExpensesBinding
-import vcmsa.projects.pcv1.ui.expenses.ExpensesViewModel
+import vcmsa.projects.pcv1.util.SessionManager
 
 class ExpensesFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = ExpensesFragment()
-    }
-
-    private val viewModel: ExpensesViewModel by viewModels()
-
     private var _binding: FragmentExpensesBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var expenseRepository: ExpenseRepository
+    private lateinit var adapter: ExpenseAdapter
+    private lateinit var session: SessionManager
+    private var currentUserId: Int = -1
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        val expensesViewModel =
-            ViewModelProvider(this).get(ExpensesViewModel::class.java)
-
+        //_binding = FragmentExpensesBinding.inflate(inflater, container, false)
         _binding = FragmentExpensesBinding.inflate(inflater, container, false)
-        val root: View = binding.root
 
-        val textView: TextView = binding.textExpenses
-        expensesViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        session = SessionManager(requireContext())
+        currentUserId = session.getUserId()
+        expenseRepository = ExpenseRepository(AppDatabase.getInstance(requireContext()).expenseDao())
+
+        adapter = ExpenseAdapter(emptyList())
+        binding.recyclerExpenses.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerExpenses.adapter = adapter
+        //binding.recyclerViewExpenses.layoutManager = LinearLayoutManager(requireContext())
+        //binding.recyclerViewExpenses.adapter = adapter
+
+        binding.fabAddExpense.setOnClickListener {
+            findNavController().navigate(R.id.addExpenseFragment)
+
+            // Navigate to AddExpenseFragment (you may use Navigation Component or FragmentTransaction)
+//            parentFragmentManager.beginTransaction()
+//                .replace(this.id, AddExpenseFragment() )
+//                .addToBackStack(null)
+//                .commit()
         }
-        return root
+
+        loadExpenses()
+
+        return binding.root
+    }
+
+    private fun loadExpenses() {
+        lifecycleScope.launch {
+            val expenses = expenseRepository.getExpensesForUser(currentUserId)
+            adapter.updateData(expenses)
+        }
     }
 
     override fun onDestroyView() {

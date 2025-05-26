@@ -12,4 +12,12 @@ interface BudgetDao {
 
     @Query("SELECT * FROM budgets WHERE userId = :userId LIMIT 1")
     suspend fun getBudgetForUser(userId: Int): Budget?
+
+    @Query("""
+    SELECT SUM(amount) FROM expenses 
+    WHERE userId = :userId 
+    AND strftime('%Y-%m', timestamp) = strftime('%Y-%m', 'now')
+""")
+    suspend fun getTotalSpentThisMonth(userId: Int): Double?
+
 }

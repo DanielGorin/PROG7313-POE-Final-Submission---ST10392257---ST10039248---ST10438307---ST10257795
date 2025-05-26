@@ -39,6 +39,33 @@
             android:inputType="numberDecimal"
             android:hint="e.g. 2000.00" />
 
+        <TextView
+            android:id="@+id/textBudgetUsage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Budget Usage"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingTop="16dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBudget"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:progress="0"
+            android:max="100"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:progressDrawable="@drawable/budget_progress_bar" />
+
+        <TextView
+            android:id="@+id/textBudgetAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="R0.00 spent of R0.00"
+            android:textSize="14sp"
+            android:paddingTop="8dp" />
+
+
         <Button
             android:id="@+id/btnSaveBudget"
             android:layout_width="match_parent"

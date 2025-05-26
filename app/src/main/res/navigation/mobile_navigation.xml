@@ -30,6 +30,12 @@
         tools:layout="@layout/fragment_expenses" />
 
     <fragment
+        android:id="@+id/addExpenseFragment"
+        android:name="vcmsa.projects.pcv1.ui.expenses.AddExpenseFragment"
+        android:label="Add Expense" />
+
+
+    <fragment
         android:id="@+id/navigation_profile"
         android:name="vcmsa.projects.pcv1.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
