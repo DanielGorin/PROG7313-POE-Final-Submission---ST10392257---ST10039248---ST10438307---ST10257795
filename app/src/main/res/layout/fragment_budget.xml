@@ -134,13 +134,27 @@
         </LinearLayout>
     </ScrollView>
 
+
     <ImageView
         android:id="@+id/coinFlipImage"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerInParent="true"
-        android:visibility="gone"
-        android:src="@drawable/coin_head" />
+        android:src="@drawable/coin_head"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/coinTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text=""
+        android:textColor="#FFFB00"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+
 
 
 

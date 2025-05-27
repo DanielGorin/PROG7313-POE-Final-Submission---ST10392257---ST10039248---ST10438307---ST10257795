@@ -194,7 +194,12 @@ class BudgetFragment : Fragment() {
 
     private fun startCoinFlipAnimation(amount: Double, remaining: Double) {
         val coinImage = binding.coinFlipImage
+        val choice = binding.coinTextView
         coinImage.visibility = View.VISIBLE
+        //choice.visibility = View.VISIBLE
+
+
+
 
         val animator = ObjectAnimator.ofFloat(coinImage, View.ROTATION_Y, 0f, 1800f).apply {
             duration = 5000
@@ -203,17 +208,22 @@ class BudgetFragment : Fragment() {
 
         animator.doOnEnd {
             val result = if (shouldSpend(amount, remaining)) {
+                choice.visibility = View.VISIBLE
+                choice.text = "Spend!"
                 coinImage.setImageResource(R.drawable.coin_head)
                 "Spend!"
             } else {
+                choice.text = "Save!"
+                choice.visibility = View.VISIBLE
                 coinImage.setImageResource(R.drawable.coin_tail)
                 "Save!"
             }
 
             Toast.makeText(requireContext(), result, Toast.LENGTH_LONG).show()
             coinImage.postDelayed({
+                choice.visibility = View.GONE
                 coinImage.visibility = View.GONE
-            }, 1000)
+            }, 3000)
         }
 
         animator.start()
