@@ -26,6 +26,7 @@ class BudgetFragment : Fragment() {
     private lateinit var expenseRepository: ExpenseRepository
     private lateinit var session: SessionManager
     private var currentUserId: Int = -1
+    private var isEditing = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -38,22 +39,26 @@ class BudgetFragment : Fragment() {
         repository = BudgetRepository(db.budgetDao())
         expenseRepository = ExpenseRepository(db.expenseDao())
 
-        loadUserBudget()
-        loadCurrentSpending()
+        setupListeners()
+        updateUIBasedOnBudget()
 
+        return binding.root
+    }
+
+    private fun setupListeners() {
         binding.btnSaveBudget.setOnClickListener {
             val min = binding.editMinBudget.text.toString().toDoubleOrNull()
             val max = binding.editMaxBudget.text.toString().toDoubleOrNull()
 
             if (min != null && max != null && min <= max) {
                 lifecycleScope.launch {
-                    val user = db.userDao().getUserById(currentUserId)
+                    val user = AppDatabase.getInstance(requireContext()).userDao().getUserById(currentUserId)
                     if (user != null) {
                         val budget = Budget(userId = currentUserId, minAmount = min, maxAmount = max)
                         repository.saveBudget(budget)
                         Toast.makeText(requireContext(), "Budget saved!", Toast.LENGTH_SHORT).show()
-                        loadUserBudget()
-                        loadCurrentSpending()
+                        isEditing = false
+                        updateUIBasedOnBudget()
                     } else {
                         Toast.makeText(requireContext(), "User not found. Cannot save budget.", Toast.LENGTH_LONG).show()
                     }
@@ -63,15 +68,73 @@ class BudgetFragment : Fragment() {
             }
         }
 
-        return binding.root
+        binding.btnEditBudget.setOnClickListener {
+            isEditing = true
+            updateUIBasedOnBudget()
+        }
+
+        binding.fabBudgetAction.setOnClickListener {
+            // You can add functionality here later
+            Toast.makeText(requireContext(), "FAB clicked", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun loadUserBudget() {
+    private fun updateUIBasedOnBudget() {
         lifecycleScope.launch {
             val budget = repository.getBudget(currentUserId)
-            budget?.let {
-                binding.editMinBudget.setText(it.minAmount.toString())
-                binding.editMaxBudget.setText(it.maxAmount.toString())
+            val hasBudget = budget != null
+
+            if (isEditing || !hasBudget) {
+                // Show input fields
+                binding.editMinBudget.visibility = View.VISIBLE
+                binding.editMaxBudget.visibility = View.VISIBLE
+                binding.btnSaveBudget.visibility = View.VISIBLE
+
+                // Hide value TextViews
+                binding.textMinValue.visibility = View.GONE
+                binding.textMaxValue.visibility = View.GONE
+
+                // Hide progress views
+                binding.textBudgetUsage.visibility = View.GONE
+                binding.progressBudget.visibility = View.GONE
+                binding.textBudgetAmount.visibility = View.GONE
+            } else {
+                // Hide input fields
+                binding.editMinBudget.visibility = View.GONE
+                binding.editMaxBudget.visibility = View.GONE
+                binding.btnSaveBudget.visibility = View.GONE
+
+                // Show value TextViews
+                binding.textMinValue.visibility = View.VISIBLE
+                binding.textMaxValue.visibility = View.VISIBLE
+
+                // Show budget info
+                binding.textBudgetUsage.visibility = View.VISIBLE
+                binding.progressBudget.visibility = View.VISIBLE
+                binding.textBudgetAmount.visibility = View.VISIBLE
+
+                // Set values
+                if (budget != null) {
+                    binding.textMinValue.text = String.format("R%.2f", budget.minAmount)
+                }
+                if (budget != null) {
+                    binding.textMaxValue.text = String.format("R%.2f", budget.maxAmount)
+                }
+            }
+
+            // Always show edit button and FAB
+            binding.btnEditBudget.visibility = if (hasBudget && !isEditing) View.VISIBLE else View.GONE
+            binding.fabBudgetAction.visibility = View.VISIBLE
+
+            // Pre-fill inputs if editing
+            if (budget != null && isEditing) {
+                binding.editMinBudget.setText(budget.minAmount.toString())
+                binding.editMaxBudget.setText(budget.maxAmount.toString())
+            }
+
+            // Load progress if not editing
+            if (hasBudget) {
+                loadCurrentSpending()
             }
         }
     }
@@ -82,31 +145,22 @@ class BudgetFragment : Fragment() {
             val spending = expenseRepository.getMonthlySpending(currentUserId, yearMonth)
             val budget = repository.getBudget(currentUserId)
 
-            //binding.textCurrentSpending.text = "Current Spending: R%.2f".format(spending)
-            binding.textBudgetUsage.text = "Budget Usage: R%.2f".format(spending)
-
-
             if (budget != null && budget.maxAmount > 0) {
                 val percent = ((spending / budget.maxAmount) * 100).toInt().coerceAtMost(100)
 
                 binding.progressBudget.progress = percent
-
-                // Update display text
+                binding.textBudgetUsage.text = "Budget Usage"
                 binding.textBudgetAmount.text = String.format("R%.2f spent of R%.2f", spending, budget.maxAmount)
 
-                // Update progress bar color
                 val color = when {
                     percent >= 80 -> Color.RED
                     percent >= 50 -> Color.YELLOW
                     else -> Color.GREEN
                 }
-                //binding.progressBarBudget.progressDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN)
-                val progressDrawable = binding.progressBudget.progressDrawable
-                DrawableCompat.setTint(progressDrawable, color)
 
+                DrawableCompat.setTint(binding.progressBudget.progressDrawable, color)
             } else {
-                //binding.progressBarBudget.progress = 0
-                binding.progressBudget.progress =0
+                binding.progressBudget.progress = 0
                 binding.textBudgetAmount.text = "No budget set"
             }
         }

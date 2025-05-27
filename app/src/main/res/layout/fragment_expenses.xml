@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="97dp"
         android:contentDescription="Add Expense"
         app:srcCompat="@drawable/ic_add"
         app:tint="@android:color/white" />

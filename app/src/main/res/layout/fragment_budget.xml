@@ -1,76 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/budgetScrollView"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/budgetRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
+        android:id="@+id/budgetScrollView"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btnEditBudget">
+
+        <LinearLayout
+            android:id="@+id/budgetContentLayout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Budget Input Section -->
+            <LinearLayout
+                android:id="@+id/budgetInputSection"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Min Budget Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:text="Minimum Monthly Budget"
+                        android:textSize="16sp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/textMinValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:visibility="gone"
+                        android:textColor="@android:color/darker_gray" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/editMinBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="e.g. 500.00" />
+
+                <!-- Max Budget Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:text="Maximum Monthly Budget"
+                        android:textSize="16sp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/textMaxValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:visibility="gone"
+                        android:textColor="@android:color/darker_gray" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/editMaxBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="e.g. 2000.00" />
+
+                <Button
+                    android:id="@+id/btnSaveBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Save Budget"
+                    android:layout_marginTop="24dp" />
+            </LinearLayout>
+
+            <!-- Budget Display Section -->
+            <LinearLayout
+                android:id="@+id/budgetDisplaySection"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp">
+
+                <TextView
+                    android:id="@+id/textBudgetUsage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Budget Usage"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/progressBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"
+                    android:progress="0"
+                    android:max="100"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:progressDrawable="@drawable/budget_progress_bar"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/textBudgetAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="R0.00 spent of R0.00"
+                    android:textSize="14sp"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Edit Button (hidden initially) -->
+    <Button
+        android:id="@+id/btnEditBudget"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp">
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="80dp"
+        android:text="Edit Budget"
+        android:visibility="invisible" />
 
-        <TextView
-            android:text="Minimum Monthly Budget"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <EditText
-            android:id="@+id/editMinBudget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="e.g. 500.00" />
-
-        <TextView
-            android:text="Maximum Monthly Budget"
-            android:textSize="16sp"
-            android:layout_marginTop="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <EditText
-            android:id="@+id/editMaxBudget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="e.g. 2000.00" />
-
-        <TextView
-            android:id="@+id/textBudgetUsage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Budget Usage"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:paddingTop="16dp" />
-
-        <ProgressBar
-            android:id="@+id/progressBudget"
-            android:layout_width="match_parent"
-            android:layout_height="16dp"
-            android:progress="0"
-            android:max="100"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:progressDrawable="@drawable/budget_progress_bar" />
-
-        <TextView
-            android:id="@+id/textBudgetAmount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="R0.00 spent of R0.00"
-            android:textSize="14sp"
-            android:paddingTop="8dp" />
-
-
-        <Button
-            android:id="@+id/btnSaveBudget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save Budget"
-            android:layout_marginTop="24dp"/>
-    </LinearLayout>
-</ScrollView>
+    <!-- Floating Action Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabBudgetAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="80dp"
+        android:src="@drawable/ic_splurge_dice"
+        android:contentDescription="FAB Action"
+        app:backgroundTint="@color/purple_500"
+        app:tint="@android:color/white" />
+</RelativeLayout>
