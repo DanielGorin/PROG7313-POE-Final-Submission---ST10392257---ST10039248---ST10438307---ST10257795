@@ -1,11 +1,13 @@
 package vcmsa.projects.pcv1.ui.expenses
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import vcmsa.projects.pcv1.R
 import vcmsa.projects.pcv1.data.Expense
 import java.text.SimpleDateFormat
@@ -42,13 +44,17 @@ class ExpenseAdapter(private var expenses: List<Expense>) :
         holder.textDate.text = dateFormat.format(date)
         holder.textTime.text = timeFormat.format(date)
 
-        // You’ll replace this with actual category name lookup
+        // Placeholder for actual category lookup
         holder.textCategory.text = "Category ID: ${expense.categoryId ?: "None"}"
 
-        // Handle photo visibility
+        // Load photo using Glide
         if (!expense.photoUri.isNullOrEmpty()) {
             holder.imagePhoto.visibility = View.VISIBLE
-            holder.imagePhoto.setImageURI(android.net.Uri.parse(expense.photoUri))
+            Glide.with(holder.itemView.context)
+                .load(Uri.parse(expense.photoUri))
+                .placeholder(R.drawable.placeholder) // optional
+                .error(R.drawable.image_error)       // optional
+                .into(holder.imagePhoto)
         } else {
             holder.imagePhoto.visibility = View.GONE
         }

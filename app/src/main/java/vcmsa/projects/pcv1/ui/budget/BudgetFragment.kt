@@ -12,12 +12,16 @@ import android.view.animation.LinearInterpolator
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.coroutines.launch
 import vcmsa.projects.pcv1.R
 import vcmsa.projects.pcv1.data.AppDatabase
@@ -30,6 +34,7 @@ import vcmsa.projects.pcv1.util.SessionManager
 import java.security.KeyStore
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class BudgetFragment : Fragment() {
@@ -176,38 +181,103 @@ class BudgetFragment : Fragment() {
     }
 
     private fun updateGraph(expenses: List<Expense>, maxBudget: Double) {
+        // 1. Filter expenses to current month
+        val calendar = Calendar.getInstance().apply { set(Calendar.DAY_OF_MONTH, 1) }
+        val startOfMonth = calendar.timeInMillis
+        calendar.add(Calendar.MONTH, 1)
+        val endOfMonth = calendar.timeInMillis
+
+        val monthlyExpenses = expenses.filter {
+            it.timestamp in startOfMonth until endOfMonth
+        }
+
+        // 2. Prepare daily totals
+        val dailyTotals = mutableMapOf<String, Double>()
+        val dateFormatter = SimpleDateFormat("dd MMM", Locale.getDefault())
+
+        for (expense in monthlyExpenses) {
+            val date = dateFormatter.format(Date(expense.timestamp))
+            dailyTotals[date] = dailyTotals.getOrDefault(date, 0.0) + expense.amount
+        }
+
+        // 3. Generate full date range for the month
+        val labels = mutableListOf<String>()
+        val start = Calendar.getInstance().apply {
+            timeInMillis = startOfMonth
+        }
+        while (start.timeInMillis < endOfMonth) {
+            labels.add(dateFormatter.format(start.time))
+            start.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        // 4. Calculate remaining budget per day
         val entries = mutableListOf<Entry>()
-        val calendar = Calendar.getInstance()
-
-        val spendingByDay = mutableMapOf<Int, Double>()
-        expenses.forEach { expense ->
-            calendar.timeInMillis = expense.timestamp
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-            spendingByDay[day] = (spendingByDay[day] ?: 0.0) + expense.amount
+        var runningTotal = 0.0
+        for ((index, date) in labels.withIndex()) {
+            runningTotal += dailyTotals[date] ?: 0.0
+            val remaining = maxBudget - runningTotal
+            entries.add(Entry(index + 1f, remaining.toFloat()))
         }
 
-        var remainingBudget = maxBudget
-        for (day in 1..calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-            val spentToday = spendingByDay[day] ?: 0.0
-            remainingBudget -= spentToday
-            entries.add(Entry(day.toFloat(), remainingBudget.toFloat()))
-        }
-
+        // 5. Create data set with cubic smoothing and fill
         val dataSet = LineDataSet(entries, "Remaining Budget").apply {
-            color = Color.BLUE
-            valueTextColor = Color.BLACK
+            color = ContextCompat.getColor(requireContext(), R.color.teal_700)
+            valueTextColor = Color.TRANSPARENT
             lineWidth = 2f
+            setDrawFilled(true)
+            fillDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.graph_gradient)
+            //mode = LineDataSet.Mode.CUBIC_BEZIER
             setDrawCircles(true)
-            setDrawValues(true)
+            circleRadius = 3f
+            setCircleColor(ContextCompat.getColor(requireContext(), R.color.teal_700))
         }
 
-        binding.lineChart.data = LineData(dataSet)
+        // 6. Setup chart with marker view
+        val lineData = LineData(dataSet)
+        binding.lineChart.data = lineData
+        binding.lineChart.description.isEnabled = false
+        binding.lineChart.setTouchEnabled(true)
+        binding.lineChart.setPinchZoom(true)
+        binding.lineChart.setScaleEnabled(true)
+
+        // 7. MarkerView for tap-to-tooltip
+        val marker = BudgetMarkerView(requireContext(), R.layout.marker_view, labels)
+        binding.lineChart.marker = marker
+
+        // 8. X-axis formatting
+        val xAxis = binding.lineChart.xAxis
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.textColor = Color.GRAY
+        xAxis.textSize = 10f
+        xAxis.granularity = 1f
+        xAxis.setDrawGridLines(false)
+        xAxis.valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                val index = value.toInt() - 1
+                return if (index in labels.indices && index % 5 == 0) labels[index] else ""
+            }
+        }
+
+        // 9. Y-axis limit line for max budget
+        val leftAxis = binding.lineChart.axisLeft
+        leftAxis.removeAllLimitLines()
+        val limitLine = LimitLine(maxBudget.toFloat(), "Max Budget").apply {
+            lineColor = Color.RED
+            lineWidth = 2f
+            textColor = Color.RED
+            textSize = 12f
+        }
+        leftAxis.addLimitLine(limitLine)
+        leftAxis.textColor = Color.GRAY
+
+        binding.lineChart.axisRight.isEnabled = false
+
+        // 10. Refresh chart
         binding.lineChart.invalidate()
-
-        if (remainingBudget < 0) {
-            Toast.makeText(requireContext(), "You have overspent your budget!", Toast.LENGTH_LONG).show()
-        }
     }
+
+
+
 
 
 
