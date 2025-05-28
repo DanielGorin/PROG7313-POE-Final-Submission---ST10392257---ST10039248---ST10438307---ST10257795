@@ -9,11 +9,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import vcmsa.projects.pcv1.R
+import vcmsa.projects.pcv1.data.Category
 import vcmsa.projects.pcv1.data.Expense
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ExpenseAdapter(private var expenses: List<Expense>) :
+class ExpenseAdapter(private var expenses: List<Expense>,
+                     private var categoryMap: Map<Int, String>,
+                     ) :
     RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
 
     inner class ExpenseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -45,7 +48,10 @@ class ExpenseAdapter(private var expenses: List<Expense>) :
         holder.textTime.text = timeFormat.format(date)
 
         // Placeholder for actual category lookup
-        holder.textCategory.text = "Category ID: ${expense.categoryId ?: "None"}"
+        val categoryName = expense.categoryId?.let { categoryMap[it] } ?: "Uncategorized"
+        holder.textCategory.text = categoryName
+
+
 
         // Load photo using Glide
         if (!expense.photoUri.isNullOrEmpty()) {
@@ -62,8 +68,9 @@ class ExpenseAdapter(private var expenses: List<Expense>) :
 
     override fun getItemCount(): Int = expenses.size
 
-    fun updateData(newExpenses: List<Expense>) {
+    fun updateData(newExpenses: List<Expense>, newCategoryMap: Map<Int, String>) {
         expenses = newExpenses
+        categoryMap = newCategoryMap
         notifyDataSetChanged()
     }
 }

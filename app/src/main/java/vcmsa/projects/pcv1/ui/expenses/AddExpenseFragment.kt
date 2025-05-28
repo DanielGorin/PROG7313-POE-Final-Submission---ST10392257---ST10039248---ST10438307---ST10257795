@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -25,7 +26,9 @@ class AddExpenseFragment : Fragment() {
     private var currentUserId: Int = -1
     private var selectedTimestamp: Long = System.currentTimeMillis()
     private var selectedPhotoUri: String? = null
-    private var selectedCategoryId: Int? = null
+    private var selectedCategoryId: Int = -1
+
+    private var currentCategories: List<Category> = listOf()
 
     private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -54,25 +57,80 @@ class AddExpenseFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupCategorySpinner() {
+    private fun setupCategorySpinner(preselectId: Int? = null) {
         lifecycleScope.launch {
-            val categories = categoryRepository.getCategoriesForUser(currentUserId)
-            val names = categories.map { it.icon + " " + it.name }
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, names)
+            currentCategories = categoryRepository.getCategoriesForUser(currentUserId)
+
+            val categoryNames = currentCategories.map { "${it.icon} ${it.name}" }.toMutableList()
+            categoryNames.add("➕ Add New Category")
+
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryNames)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.spinnerCategory.adapter = adapter
 
+            if (preselectId != null) {
+                val index = currentCategories.indexOfFirst { it.id == preselectId }
+                if (index != -1) binding.spinnerCategory.setSelection(index)
+            }
+
             binding.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                    selectedCategoryId = categories[position].id
+                    if (position == currentCategories.size) {
+                        showAddCategoryDialog()
+                    } else {
+                        selectedCategoryId = currentCategories[position].id
+                    }
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                    selectedCategoryId = null
-                }
+                override fun onNothingSelected(parent: AdapterView<*>) {}
             }
         }
     }
+
+    private fun showAddCategoryDialog() {
+        val layout = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(50, 40, 50, 10)
+        }
+
+        val inputName = EditText(requireContext()).apply {
+            hint = "Category name"
+        }
+
+        val inputIcon = EditText(requireContext()).apply {
+            hint = "Optional emoji/icon"
+        }
+
+        layout.addView(inputName)
+        layout.addView(inputIcon)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Add New Category")
+            .setView(layout)
+            .setPositiveButton("Add") { _, _ ->
+                val name = inputName.text.toString().trim()
+                val icon = inputIcon.text.toString().trim()
+
+                if (name.isNotEmpty()) {
+                    val newCategory = Category(userId = currentUserId, name = name, icon = icon.ifEmpty { null })
+
+                    lifecycleScope.launch {
+                        val result = categoryRepository.addCategory(newCategory)
+                        if (result.isSuccess) {
+                            setupCategorySpinner() // Reload spinner
+                            Toast.makeText(requireContext(), "Category added", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(requireContext(), "Error adding category", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Category name cannot be empty", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
 
     private fun setupDateTimePickers() {
         val calendar = Calendar.getInstance()
@@ -101,14 +159,13 @@ class AddExpenseFragment : Fragment() {
         }
     }
 
-
     private fun calculateTimestamp(date: String, time: String): Long {
         return try {
-            val parts = date.split("-") // Expected format: "yyyy-MM-dd"
-            val timeParts = time.split(":") // Expected format: "HH:mm"
+            val parts = date.split("-")
+            val timeParts = time.split(":")
 
             val year = parts[0].toInt()
-            val month = parts[1].toInt() - 1 // Calendar month is 0-based
+            val month = parts[1].toInt() - 1
             val day = parts[2].toInt()
             val hour = timeParts[0].toInt()
             val minute = timeParts[1].toInt()
@@ -120,10 +177,9 @@ class AddExpenseFragment : Fragment() {
 
             calendar.timeInMillis
         } catch (e: Exception) {
-            System.currentTimeMillis() // fallback
+            System.currentTimeMillis()
         }
     }
-
 
     private fun setupImagePicker() {
         binding.btnAttachPhoto.setOnClickListener {
@@ -134,8 +190,8 @@ class AddExpenseFragment : Fragment() {
     private fun saveExpense() {
         val amount = binding.editAmount.text.toString().toDoubleOrNull()
         val description = binding.editDescription.text.toString().ifBlank { null }
-        val date = binding.editDate.text.toString().ifBlank { null }
-        val startTime = binding.editStartTime.text.toString().ifBlank { null }
+        val date = binding.editDate.text.toString()
+        val startTime = binding.editStartTime.text.toString()
         val endTime = binding.editEndTime.text.toString().ifBlank { null }
 
         if (amount == null || amount <= 0) {
@@ -143,34 +199,29 @@ class AddExpenseFragment : Fragment() {
             return
         }
 
-        if (date == null || startTime == null) {
-            Toast.makeText(requireContext(), "Please select both date and start time", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val dateStr = binding.editDate.text.toString()
-        val startTimeStr = binding.editStartTime.text.toString()
-        val endTimeStr = binding.editEndTime.text.toString().ifBlank { null }
-
-        if (dateStr.isBlank() || startTimeStr.isBlank()) {
+        if (date.isBlank() || startTime.isBlank()) {
             Toast.makeText(requireContext(), "Date and start time are required", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val calculatedTimestamp = calculateTimestamp(dateStr, startTimeStr)
+        if (selectedCategoryId == -1) {
+            Toast.makeText(requireContext(), "Please select or add a category", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val calculatedTimestamp = calculateTimestamp(date, startTime)
 
         val expense = Expense(
             userId = currentUserId,
-            categoryId = selectedCategoryId ?: 0,
+            categoryId = selectedCategoryId,
             amount = amount,
-            description = description?.ifBlank { null },
+            description = description,
             photoUri = selectedPhotoUri,
-            date = dateStr,
-            startTime = startTimeStr,
-            endTime = endTimeStr,
+            date = date,
+            startTime = startTime,
+            endTime = endTime,
             timestamp = calculatedTimestamp
         )
-
 
         lifecycleScope.launch {
             expenseRepository.addExpense(expense)
@@ -178,7 +229,6 @@ class AddExpenseFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

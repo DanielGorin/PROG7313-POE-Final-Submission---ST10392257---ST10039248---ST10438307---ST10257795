@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import vcmsa.projects.pcv1.R
 import vcmsa.projects.pcv1.data.AppDatabase
+import vcmsa.projects.pcv1.data.CategoryRepository
 import vcmsa.projects.pcv1.data.ExpenseRepository
-//import vcmsa.projects.pcv1.databinding.FragmentExpenseBinding
 import vcmsa.projects.pcv1.databinding.FragmentExpensesBinding
 import vcmsa.projects.pcv1.util.SessionManager
 
@@ -23,44 +23,56 @@ class ExpensesFragment : Fragment() {
     private lateinit var expenseRepository: ExpenseRepository
     private lateinit var adapter: ExpenseAdapter
     private lateinit var session: SessionManager
+    private var categoryMap: Map<Int, String> = emptyMap()
     private var currentUserId: Int = -1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        //_binding = FragmentExpensesBinding.inflate(inflater, container, false)
         _binding = FragmentExpensesBinding.inflate(inflater, container, false)
 
         session = SessionManager(requireContext())
         currentUserId = session.getUserId()
-        expenseRepository = ExpenseRepository(AppDatabase.getInstance(requireContext()).expenseDao())
 
-        adapter = ExpenseAdapter(emptyList())
-        binding.recyclerExpenses.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerExpenses.adapter = adapter
-        //binding.recyclerViewExpenses.layoutManager = LinearLayoutManager(requireContext())
-        //binding.recyclerViewExpenses.adapter = adapter
-
-        binding.fabAddExpense.setOnClickListener {
-            findNavController().navigate(R.id.addExpenseFragment)
-
-            // Navigate to AddExpenseFragment (you may use Navigation Component or FragmentTransaction)
-//            parentFragmentManager.beginTransaction()
-//                .replace(this.id, AddExpenseFragment() )
-//                .addToBackStack(null)
-//                .commit()
-        }
-
-        loadExpenses()
+        setupListeners()
+        setupRecyclerView()
 
         return binding.root
+    }
+
+    private fun setupRecyclerView() {
+        lifecycleScope.launch {
+            val db = AppDatabase.getInstance(requireContext())
+            expenseRepository = ExpenseRepository(db.expenseDao())
+            val categoryRepository = CategoryRepository(db.categoryDao())
+
+            val categories = categoryRepository.getCategoriesForUser(currentUserId)
+            categoryMap = categories.associateBy({ it.id }, { "${it.icon ?: ""} ${it.name}" })
+
+            adapter = ExpenseAdapter(emptyList(), categoryMap)
+            binding.recyclerExpenses.layoutManager = LinearLayoutManager(requireContext())
+            binding.recyclerExpenses.adapter = adapter
+
+            loadExpenses()
+        }
+    }
+
+    private fun setupListeners() {
+        binding.fabAddExpense.setOnClickListener {
+            findNavController().navigate(R.id.addExpenseFragment)
+        }
     }
 
     private fun loadExpenses() {
         lifecycleScope.launch {
             val expenses = expenseRepository.getExpensesForUser(currentUserId)
-            adapter.updateData(expenses)
+            adapter.updateData(expenses, categoryMap)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadExpenses() // Reload when returning from AddExpenseFragment
     }
 
     override fun onDestroyView() {
