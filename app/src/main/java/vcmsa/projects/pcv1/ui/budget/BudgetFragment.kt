@@ -15,14 +15,22 @@ import androidx.core.animation.doOnEnd
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.coroutines.launch
 import vcmsa.projects.pcv1.R
 import vcmsa.projects.pcv1.data.AppDatabase
 import vcmsa.projects.pcv1.data.Budget
 import vcmsa.projects.pcv1.data.BudgetRepository
+import vcmsa.projects.pcv1.data.Expense
 import vcmsa.projects.pcv1.data.ExpenseRepository
 import vcmsa.projects.pcv1.databinding.FragmentBudgetBinding
 import vcmsa.projects.pcv1.util.SessionManager
+import java.security.KeyStore
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class BudgetFragment : Fragment() {
 
@@ -147,6 +155,11 @@ class BudgetFragment : Fragment() {
                 }
 
                 DrawableCompat.setTint(binding.progressBudget.progressDrawable, color)
+
+                // 👇 Add this block
+                val expenses = expenseRepository.getExpensesByMonth(currentUserId, yearMonth)
+                updateGraph(expenses, budget.maxAmount)
+
             } else {
                 binding.progressBudget.progress = 0
                 binding.textBudgetAmount.text = "No budget set"
@@ -154,12 +167,49 @@ class BudgetFragment : Fragment() {
         }
     }
 
+
     private fun getCurrentYearMonth(): String {
         val now = java.util.Calendar.getInstance()
         val year = now.get(java.util.Calendar.YEAR)
         val month = now.get(java.util.Calendar.MONTH) + 1
         return String.format("%04d-%02d", year, month)
     }
+
+    private fun updateGraph(expenses: List<Expense>, maxBudget: Double) {
+        val entries = mutableListOf<Entry>()
+        val calendar = Calendar.getInstance()
+
+        val spendingByDay = mutableMapOf<Int, Double>()
+        expenses.forEach { expense ->
+            calendar.timeInMillis = expense.timestamp
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+            spendingByDay[day] = (spendingByDay[day] ?: 0.0) + expense.amount
+        }
+
+        var remainingBudget = maxBudget
+        for (day in 1..calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+            val spentToday = spendingByDay[day] ?: 0.0
+            remainingBudget -= spentToday
+            entries.add(Entry(day.toFloat(), remainingBudget.toFloat()))
+        }
+
+        val dataSet = LineDataSet(entries, "Remaining Budget").apply {
+            color = Color.BLUE
+            valueTextColor = Color.BLACK
+            lineWidth = 2f
+            setDrawCircles(true)
+            setDrawValues(true)
+        }
+
+        binding.lineChart.data = LineData(dataSet)
+        binding.lineChart.invalidate()
+
+        if (remainingBudget < 0) {
+            Toast.makeText(requireContext(), "You have overspent your budget!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
 
     private fun showSplurgePrompt() {
         val input = EditText(requireContext()).apply {

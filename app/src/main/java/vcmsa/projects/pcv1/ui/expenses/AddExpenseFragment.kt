@@ -79,25 +79,51 @@ class AddExpenseFragment : Fragment() {
 
         binding.editDate.setOnClickListener {
             DatePickerDialog(requireContext(), { _, year, month, day ->
-                calendar.set(year, month, day)
-                updateTimestamp(calendar)
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, day)
+                binding.editDate.setText(android.text.format.DateFormat.format("yyyy-MM-dd", calendar))
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        binding.editTime.setOnClickListener {
+        binding.editStartTime.setOnClickListener {
             TimePickerDialog(requireContext(), { _, hour, minute ->
-                calendar.set(Calendar.HOUR_OF_DAY, hour)
-                calendar.set(Calendar.MINUTE, minute)
-                updateTimestamp(calendar)
+                val timeStr = String.format("%02d:%02d", hour, minute)
+                binding.editStartTime.setText(timeStr)
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
+        }
+
+        binding.editEndTime.setOnClickListener {
+            TimePickerDialog(requireContext(), { _, hour, minute ->
+                val timeStr = String.format("%02d:%02d", hour, minute)
+                binding.editEndTime.setText(timeStr)
             }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
         }
     }
 
-    private fun updateTimestamp(calendar: Calendar) {
-        selectedTimestamp = calendar.timeInMillis
-        binding.editDate.setText(android.text.format.DateFormat.format("yyyy-MM-dd", calendar))
-        binding.editTime.setText(android.text.format.DateFormat.format("HH:mm", calendar))
+
+    private fun calculateTimestamp(date: String, time: String): Long {
+        return try {
+            val parts = date.split("-") // Expected format: "yyyy-MM-dd"
+            val timeParts = time.split(":") // Expected format: "HH:mm"
+
+            val year = parts[0].toInt()
+            val month = parts[1].toInt() - 1 // Calendar month is 0-based
+            val day = parts[2].toInt()
+            val hour = timeParts[0].toInt()
+            val minute = timeParts[1].toInt()
+
+            val calendar = Calendar.getInstance().apply {
+                set(year, month, day, hour, minute, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            calendar.timeInMillis
+        } catch (e: Exception) {
+            System.currentTimeMillis() // fallback
+        }
     }
+
 
     private fun setupImagePicker() {
         binding.btnAttachPhoto.setOnClickListener {
@@ -107,21 +133,44 @@ class AddExpenseFragment : Fragment() {
 
     private fun saveExpense() {
         val amount = binding.editAmount.text.toString().toDoubleOrNull()
-        val description = binding.editDescription.text.toString()
+        val description = binding.editDescription.text.toString().ifBlank { null }
+        val date = binding.editDate.text.toString().ifBlank { null }
+        val startTime = binding.editStartTime.text.toString().ifBlank { null }
+        val endTime = binding.editEndTime.text.toString().ifBlank { null }
 
         if (amount == null || amount <= 0) {
             Toast.makeText(requireContext(), "Enter a valid amount", Toast.LENGTH_SHORT).show()
             return
         }
 
+        if (date == null || startTime == null) {
+            Toast.makeText(requireContext(), "Please select both date and start time", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val dateStr = binding.editDate.text.toString()
+        val startTimeStr = binding.editStartTime.text.toString()
+        val endTimeStr = binding.editEndTime.text.toString().ifBlank { null }
+
+        if (dateStr.isBlank() || startTimeStr.isBlank()) {
+            Toast.makeText(requireContext(), "Date and start time are required", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val calculatedTimestamp = calculateTimestamp(dateStr, startTimeStr)
+
         val expense = Expense(
             userId = currentUserId,
-            categoryId = selectedCategoryId,
+            categoryId = selectedCategoryId ?: 0,
             amount = amount,
-            description = description.ifBlank { null },
-            timestamp = selectedTimestamp,
-            photoUri = selectedPhotoUri
+            description = description?.ifBlank { null },
+            photoUri = selectedPhotoUri,
+            date = dateStr,
+            startTime = startTimeStr,
+            endTime = endTimeStr,
+            timestamp = calculatedTimestamp
         )
+
 
         lifecycleScope.launch {
             expenseRepository.addExpense(expense)
@@ -129,6 +178,7 @@ class AddExpenseFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

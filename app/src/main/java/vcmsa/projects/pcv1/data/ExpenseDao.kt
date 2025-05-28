@@ -23,4 +23,8 @@ interface ExpenseDao {
 
     @Query("SELECT SUM(amount) FROM expenses WHERE userId = :userId AND strftime('%Y-%m', datetime(timestamp / 1000, 'unixepoch')) = :yearMonth")
     suspend fun getMonthlySpending(userId: Int, yearMonth: String): Double?
+
+    @Query("SELECT * FROM expenses WHERE userId = :userId AND strftime('%Y-%m', datetime(timestamp / 1000, 'unixepoch')) = :yearMonth ORDER BY timestamp ASC")
+    suspend fun getExpensesByMonth(userId: Int, yearMonth: String): List<Expense>
+
 }

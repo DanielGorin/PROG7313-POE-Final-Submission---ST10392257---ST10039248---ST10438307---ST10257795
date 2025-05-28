@@ -13,4 +13,8 @@ class ExpenseRepository(private val dao: ExpenseDao) {
     suspend fun getMonthlySpending(userId: Int, yearMonth: String): Double {
         return dao.getMonthlySpending(userId, yearMonth) ?: 0.0
     }
+
+    suspend fun getExpensesByMonth(userId: Int, yearMonth: String): List<Expense> {
+        return dao.getExpensesByMonth(userId, yearMonth)
+    }
 }

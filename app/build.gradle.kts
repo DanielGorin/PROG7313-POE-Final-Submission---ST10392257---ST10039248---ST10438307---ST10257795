@@ -64,4 +64,7 @@ dependencies {
     implementation ("androidx.room:room-ktx:2.6.1")
     implementation ("org.mindrot:jbcrypt:0.4")
 
+    //graph
+    implementation(libs.mpandroidchart)
+
 }
