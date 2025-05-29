@@ -9,15 +9,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import vcmsa.projects.pcv1.R
-import vcmsa.projects.pcv1.data.Category
 import vcmsa.projects.pcv1.data.Expense
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ExpenseAdapter(private var expenses: List<Expense>,
-                     private var categoryMap: Map<Int, String>,
-                     ) :
-    RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
+class ExpenseAdapter(
+    private var expenses: List<Expense>,
+    private var categoryMap: Map<Int, String>,
+) : RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
+
+    // Public read-only access to categoryMap
+    val currentCategoryMap: Map<Int, String>
+        get() = categoryMap
 
     inner class ExpenseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textAmount: TextView = itemView.findViewById(R.id.textAmount)
@@ -47,19 +50,17 @@ class ExpenseAdapter(private var expenses: List<Expense>,
         holder.textDate.text = dateFormat.format(date)
         holder.textTime.text = timeFormat.format(date)
 
-        // Placeholder for actual category lookup
+        // Get category name
         val categoryName = expense.categoryId?.let { categoryMap[it] } ?: "Uncategorized"
         holder.textCategory.text = categoryName
-
-
 
         // Load photo using Glide
         if (!expense.photoUri.isNullOrEmpty()) {
             holder.imagePhoto.visibility = View.VISIBLE
             Glide.with(holder.itemView.context)
                 .load(Uri.parse(expense.photoUri))
-                .placeholder(R.drawable.placeholder) // optional
-                .error(R.drawable.image_error)       // optional
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.image_error)
                 .into(holder.imagePhoto)
         } else {
             holder.imagePhoto.visibility = View.GONE

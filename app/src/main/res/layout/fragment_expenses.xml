@@ -5,6 +5,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Sort + Filter Row -->
+    <LinearLayout
+        android:id="@+id/sortFilterRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:gravity="end"
+        android:layout_gravity="top|end"
+        android:layout_marginRight="20dp">
+
+        <Spinner
+            android:id="@+id/spinnerSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/sort_options"
+            android:layout_marginEnd="8dp"
+            android:spinnerMode="dropdown" />
+
+        <ImageButton
+            android:id="@+id/btnFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Filter"
+            android:src="@drawable/ic_filter_list"
+            app:tint="@color/black" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textFiltersActive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filters Active"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
+
     <!-- RecyclerView for expense list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerExpenses"
@@ -13,7 +52,8 @@
         android:padding="12dp"
         android:clipToPadding="false"
         android:scrollbars="vertical"
-        android:layout_marginBottom="80dp" />
+        android:layout_marginBottom="80dp"
+        android:layout_marginTop="30dp"/>
 
     <!-- FloatingActionButton to add new expense -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
