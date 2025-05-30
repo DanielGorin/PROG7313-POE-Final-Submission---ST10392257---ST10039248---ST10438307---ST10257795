@@ -31,7 +31,6 @@ class CategoryAdapter(
             textCategoryIcon.text = category.icon ?: "📁"
 
             btnEdit.setOnClickListener { onEdit(category) }
-            btnDelete.setOnClickListener { onDelete(category) }
             root.setOnClickListener { onClick(category) }
         }
     }
