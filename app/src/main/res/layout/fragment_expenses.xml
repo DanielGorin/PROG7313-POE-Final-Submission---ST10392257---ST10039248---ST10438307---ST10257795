@@ -36,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="horizontal"
+            android:layout_marginRight="16dp"
             android:gravity="end">
         <ImageButton
             android:id="@+id/btnFilter"
@@ -53,9 +54,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Filters Active"
-        android:textColor="@android:color/holo_red_dark"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:textColor="#4CAF50"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="40dp"
         android:visibility="gone" />
 
     <!-- RecyclerView for expense list -->
