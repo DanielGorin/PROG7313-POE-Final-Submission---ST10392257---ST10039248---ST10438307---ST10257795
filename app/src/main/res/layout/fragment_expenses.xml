@@ -67,7 +67,7 @@
         android:clipToPadding="false"
         android:scrollbars="vertical"
         android:layout_marginBottom="80dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="40dp"/>
 
     <!-- FloatingActionButton to add new expense -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
