@@ -46,4 +46,15 @@ interface ExpenseDao {
         maxAmount: Double?
     ): List<Expense>
 
+    @Query("SELECT * FROM expenses WHERE categoryId = :categoryId")
+    suspend fun getExpensesByCategory(categoryId: Int): List<Expense>
+
+    @Query("SELECT * FROM expenses WHERE categoryId = :categoryId AND date BETWEEN :start AND :end")
+    suspend fun getExpensesByCategoryAndDateRange(
+        categoryId: Int,
+        start: Long,
+        end: Long
+    ): List<Expense>
+
+
 }

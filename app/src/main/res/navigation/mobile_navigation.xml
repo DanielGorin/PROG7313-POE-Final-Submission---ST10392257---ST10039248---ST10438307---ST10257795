@@ -15,7 +15,33 @@
         android:id="@+id/navigation_category"
         android:name="vcmsa.projects.pcv1.ui.category.CategoryFragment"
         android:label="@string/title_category"
-        tools:layout="@layout/fragment_category" />
+        tools:layout="@layout/fragment_category">
+
+        <action
+            android:id="@+id/action_categoryFragment_to_categoryExpensesFragment"
+            app:destination="@id/categoryExpensesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            >
+            <argument
+                android:name="categoryId"
+                app:argType="integer" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryExpensesFragment"
+        android:name="vcmsa.projects.pcv1.ui.category.CategoryExpensesFragment"
+        android:label="Category Expenses"
+        tools:layout="@layout/fragment_category_expenses">
+
+        <argument
+            android:name="categoryId"
+            app:argType="integer" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/navigation_budget"

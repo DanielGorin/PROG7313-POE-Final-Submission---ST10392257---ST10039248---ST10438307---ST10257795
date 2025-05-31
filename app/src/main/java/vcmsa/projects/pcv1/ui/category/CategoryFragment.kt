@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,8 +49,10 @@ class CategoryFragment : Fragment() {
                 }
             },
             onClick = { category ->
-                // Future use: navigate to expenses for this category
-                // For now, you could show a Toast or Log
+
+                val action = CategoryFragmentDirections
+                    .actionCategoryFragmentToCategoryExpensesFragment(category.id)
+                findNavController().navigate(action)
                 Toast.makeText(requireContext(), "Selected: ${category.name}", Toast.LENGTH_SHORT).show()
             }
         )
