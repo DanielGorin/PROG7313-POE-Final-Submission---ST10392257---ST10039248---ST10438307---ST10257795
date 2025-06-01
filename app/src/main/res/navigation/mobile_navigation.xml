@@ -37,6 +37,9 @@
         android:label="Category Expenses"
         tools:layout="@layout/fragment_category_expenses">
 
+        <action
+            android:id="@+id/action_categoryExpensesFragment_to_expenseDetailFragment"
+            app:destination="@id/expenseDetailFragment"/>
         <argument
             android:name="categoryId"
             app:argType="integer" />
@@ -53,7 +56,21 @@
         android:id="@+id/navigation_expenses"
         android:name="vcmsa.projects.pcv1.ui.expenses.ExpensesFragment"
         android:label="@string/title_expenses"
-        tools:layout="@layout/fragment_expenses" />
+        tools:layout="@layout/fragment_expenses">
+    <action
+        android:id="@+id/action_expensesFragment_to_expenseDetailFragment"
+        app:destination="@id/expenseDetailFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/expenseDetailFragment"
+        android:name="vcmsa.projects.pcv1.ui.expenses.ExpenseDetailFragment"
+        android:label="Expense Details">
+        <argument
+            android:name="expenseId"
+            app:argType="integer" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/addExpenseFragment"

@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import vcmsa.projects.pcv1.R
@@ -36,7 +38,12 @@ class CategoryExpensesFragment : Fragment() {
             CategoryExpensesViewModelFactory(database.expenseDao(), categoryId)
         )[CategoryExpensesViewModel::class.java]
 
-        adapter = ExpenseAdapter(emptyList(), emptyMap()) // show date, amount, etc.
+        adapter = ExpenseAdapter(emptyList(), emptyMap()) { expense ->
+            // You can handle item clicks here, e.g.:
+            Toast.makeText(requireContext(), "Clicked: ${expense.description}", Toast.LENGTH_SHORT).show()
+            val action = CategoryExpensesFragmentDirections.actionCategoryExpensesFragmentToExpenseDetailFragment(expense.id)
+            findNavController().navigate(action)
+        }// show date, amount, etc.
 
         binding.recyclerCategoryExpenses.adapter = adapter
         binding.recyclerCategoryExpenses.layoutManager = LinearLayoutManager(requireContext())

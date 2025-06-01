@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -100,7 +101,13 @@ class ExpensesFragment : Fragment() {
             val categories = categoryRepository.getCategoriesForUser(currentUserId)
             val categoryMap = categories.associate { it.id to it.name }
 
-            adapter = ExpenseAdapter(emptyList(), categoryMap)
+            adapter = ExpenseAdapter(emptyList(), categoryMap) { expense ->
+                // Handle item click here (e.g., navigate to details or show a Toast)
+                Toast.makeText(requireContext(), "Clicked: ${expense.description}", Toast.LENGTH_SHORT).show()
+                val action = ExpensesFragmentDirections.actionExpensesFragmentToExpenseDetailFragment(expense.id)
+                findNavController().navigate(action)
+
+            }
             binding.recyclerExpenses.layoutManager = LinearLayoutManager(requireContext())
             binding.recyclerExpenses.adapter = adapter
             isAdapterInitialized = true
@@ -252,28 +259,6 @@ class ExpensesFragment : Fragment() {
 
 
         alertDialog.show()
-    }
-
-    private fun applyFilters() {
-        val filtered = currentExpenses.filter { expense ->
-            val matchCategory = selectedCategoryId == null || expense.categoryId == selectedCategoryId
-            val matchDate = (startDate == null || expense.timestamp >= startDate!!) &&
-                    (endDate == null || expense.timestamp <= endDate!!)
-            val matchAmount = (minAmount == null || expense.amount >= minAmount!!) &&
-                    (maxAmount == null || expense.amount <= maxAmount!!)
-            matchCategory && matchDate && matchAmount
-        }
-
-        val sorted = when (binding.spinnerSort.selectedItemPosition) {
-            0 -> filtered.sortedByDescending { it.timestamp }
-            1 -> filtered.sortedBy { it.timestamp }
-            2 -> filtered.sortedBy { it.amount }
-            3 -> filtered.sortedByDescending { it.amount }
-            else -> filtered
-        }
-
-        val map = adapter?.currentCategoryMap ?: emptyMap()
-        adapter?.updateData(sorted, map)
     }
 
     override fun onResume() {
