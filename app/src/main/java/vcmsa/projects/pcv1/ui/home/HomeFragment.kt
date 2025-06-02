@@ -31,7 +31,11 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         val context = requireContext()
+        val sessionManager = SessionManager(context)
         val userId = SessionManager(context).getUserId()
+        val username = SessionManager(context).getUsername()
+
+        binding.textWelcome.text = "Welcome, $username!"
 
         val appDatabase = AppDatabase.getInstance(context)
         viewModel = ViewModelProvider(
