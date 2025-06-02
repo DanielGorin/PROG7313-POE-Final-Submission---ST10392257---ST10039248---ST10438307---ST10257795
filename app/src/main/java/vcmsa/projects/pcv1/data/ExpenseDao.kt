@@ -1,5 +1,6 @@
 package vcmsa.projects.pcv1.data
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -55,6 +56,18 @@ interface ExpenseDao {
         start: Long,
         end: Long
     ): List<Expense>
+
+    @Query("SELECT * FROM expenses WHERE userId = :userId AND strftime('%m-%Y', date) = strftime('%m-%Y', 'now')")
+    fun getExpensesForCurrentMonth(userId: Int): LiveData<List<Expense>>
+
+    @Query("""
+    SELECT e.amount, c.name AS categoryName
+    FROM expenses AS e
+    LEFT JOIN categories AS c ON e.categoryId = c.id
+    WHERE e.userId = :userId AND strftime('%m', e.date) = strftime('%m', 'now') AND strftime('%Y', e.date) = strftime('%Y', 'now')
+""")
+    fun getCurrentMonthExpensesWithCategory(userId: Int): LiveData<List<ExpenseWithCategoryName>>
+
 
 
 }

@@ -1,5 +1,6 @@
 package vcmsa.projects.pcv1.data
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -19,5 +20,7 @@ interface BudgetDao {
     AND strftime('%Y-%m', timestamp) = strftime('%Y-%m', 'now')
 """)
     suspend fun getTotalSpentThisMonth(userId: Int): Double?
+
+
 
 }
