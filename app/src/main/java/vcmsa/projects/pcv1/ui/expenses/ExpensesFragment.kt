@@ -5,13 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,16 +13,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import vcmsa.projects.pcv1.R
-import vcmsa.projects.pcv1.data.AppDatabase
-import vcmsa.projects.pcv1.data.CategoryRepository
-import vcmsa.projects.pcv1.data.Expense
-import vcmsa.projects.pcv1.data.ExpenseFilter
-import vcmsa.projects.pcv1.data.ExpenseRepository
+import vcmsa.projects.pcv1.data.*
 import vcmsa.projects.pcv1.databinding.FragmentExpensesBinding
+import vcmsa.projects.pcv1.util.SessionManager
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class ExpensesFragment : Fragment() {
 
@@ -37,17 +26,16 @@ class ExpensesFragment : Fragment() {
 
     private lateinit var expenseRepository: ExpenseRepository
     private lateinit var categoryRepository: CategoryRepository
-
     private var adapter: ExpenseAdapter? = null
     private var isAdapterInitialized = false
 
+    // Use real user ID, loaded in onViewCreated
+    private var currentUserId: Int = -1
 
     private val viewModel: ExpensesViewModel by viewModels()
     private var currentExpenses: List<Expense>
         get() = viewModel.currentExpenses
         set(value) { viewModel.currentExpenses = value }
-    private val currentUserId: Int = 1 // Replace with actual user logic
-
 
     private var selectedCategoryId: Int? = null
     private var startDate: Long? = null
@@ -66,32 +54,40 @@ class ExpensesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Initialize user ID
+        currentUserId = SessionManager(requireContext()).getUserId()
+        if (currentUserId == -1) {
+            Toast.makeText(requireContext(), "User not logged in.", Toast.LENGTH_LONG).show()
+            return
+        }
+
         val db = AppDatabase.getInstance(requireContext())
         expenseRepository = ExpenseRepository(db.expenseDao())
         categoryRepository = CategoryRepository(db.categoryDao())
 
-
-
-
         setupListener()
         setupSpinner()
         setupRecyclerView()
-
+        loadExpenses()
     }
 
     private fun setupSpinner() {
-        val sortOptions = arrayOf("Newest First", "Oldest First", "Amount: Low to High", "Amount: High to Low")
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sortOptions)
+        val sortOptions = arrayOf(
+            "Newest First", "Oldest First",
+            "Amount: Low to High", "Amount: High to Low"
+        )
+        val spinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            sortOptions
+        )
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerSort.adapter = spinnerAdapter
 
         binding.spinnerSort.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                if (isAdapterInitialized) {
-                    applySorting(position)
-                }
+                if (isAdapterInitialized) applySorting(position)
             }
-
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
@@ -102,11 +98,9 @@ class ExpensesFragment : Fragment() {
             val categoryMap = categories.associate { it.id to it.name }
 
             adapter = ExpenseAdapter(emptyList(), categoryMap) { expense ->
-                // Handle item click here (e.g., navigate to details or show a Toast)
                 Toast.makeText(requireContext(), "Clicked: ${expense.description}", Toast.LENGTH_SHORT).show()
                 val action = ExpensesFragmentDirections.actionExpensesFragmentToExpenseDetailFragment(expense.id)
                 findNavController().navigate(action)
-
             }
             binding.recyclerExpenses.layoutManager = LinearLayoutManager(requireContext())
             binding.recyclerExpenses.adapter = adapter
@@ -119,7 +113,7 @@ class ExpensesFragment : Fragment() {
     private fun loadExpenses() {
         if (!isAdapterInitialized) return
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             val allExpenses = expenseRepository.getExpensesForUser(currentUserId)
             val filter = viewModel.currentFilter
 
@@ -134,10 +128,8 @@ class ExpensesFragment : Fragment() {
                             (filter.maxAmount == null || expense.amount <= filter.maxAmount)
                 }
             }
-
             applySorting(binding.spinnerSort.selectedItemPosition)
 
-            // Show/hide "Filters Active" message
             binding.textFiltersActive.visibility = if (filter != null) View.VISIBLE else View.GONE
         }
     }
@@ -145,24 +137,22 @@ class ExpensesFragment : Fragment() {
     private fun applySorting(sortOption: Int) {
         if (!isAdapterInitialized) return
 
-        val sortedExpenses = when (sortOption) {
-            0 -> currentExpenses.sortedByDescending { it.timestamp }       // Newest First
-            1 -> currentExpenses.sortedBy { it.timestamp }                 // Oldest First
-            2 -> currentExpenses.sortedBy { it.amount }                    // Amount: Low to High
-            3 -> currentExpenses.sortedByDescending { it.amount }         // Amount: High to Low
+        val sorted = when (sortOption) {
+            0 -> currentExpenses.sortedByDescending { it.timestamp }
+            1 -> currentExpenses.sortedBy { it.timestamp }
+            2 -> currentExpenses.sortedBy { it.amount }
+            3 -> currentExpenses.sortedByDescending { it.amount }
             else -> currentExpenses
         }
 
         val map = adapter?.currentCategoryMap ?: emptyMap()
-        adapter?.updateData(sortedExpenses, map)
-
+        adapter?.updateData(sorted, map)
     }
 
-    private fun setupListener(){
+    private fun setupListener() {
         binding.fabAddExpense.setOnClickListener {
             findNavController().navigate(R.id.addExpenseFragment)
         }
-
         binding.btnFilter.setOnClickListener {
             showFilterDialog()
         }
@@ -260,6 +250,8 @@ class ExpensesFragment : Fragment() {
 
         alertDialog.show()
     }
+
+
 
     override fun onResume() {
         super.onResume()
