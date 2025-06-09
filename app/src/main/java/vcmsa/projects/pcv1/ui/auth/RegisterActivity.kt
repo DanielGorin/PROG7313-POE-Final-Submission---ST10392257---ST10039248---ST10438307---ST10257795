@@ -22,12 +22,12 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
         repo = UserRepository(AppDatabase.getInstance(this).userDao())
         session = SessionManager(this)
-
+        // Handle submit button click
         binding.btnSubmit.setOnClickListener {
             val username = binding.etUsername.text.toString().trim()
             val password = binding.etPassword.text.toString()
             if (!validate(username, password)) return@setOnClickListener
-
+            // Launch coroutine for registration
             lifecycleScope.launch {
                 repo.register(username, password).onSuccess { user ->
                     session.saveUserId(user.id)
@@ -40,7 +40,7 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
     }
-
+    // Input validation for username and password
     private fun validate(username: String, password: String): Boolean {
         if (username.isEmpty()) { binding.etUsername.error = "Required"; return false }
         if (password.length < 8 || !password.any { it.isDigit() } || !password.any { it.isLetter() }) {

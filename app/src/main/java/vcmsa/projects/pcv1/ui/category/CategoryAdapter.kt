@@ -1,3 +1,11 @@
+// Takudzwa Murwira – ST10392257, Jason Daniel Isaacs – ST10039248, Daniel Gorin – ST10438307 and Moegammad-Yaseen Salie – ST10257795
+//PROG7313
+
+//References:
+//            https://medium.com/@SeanAT19/how-to-use-mpandroidchart-in-android-studio-c01a8150720f
+//            https://chatgpt.com/
+//            https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8SmtMNw34wvYkqj45rV1d3
+//            https://www.youtube.com/playlist?list=PLSrm9z4zp4mEPOfZNV9O-crOhoMa0G2-o
 package vcmsa.projects.pcv1.ui.category
 
 import android.view.LayoutInflater
@@ -14,9 +22,11 @@ class CategoryAdapter(
 
     private var categories = listOf<Category>()
 
+    // ViewHolder class
     inner class CategoryViewHolder(val binding: ItemCategoryBinding) :
         RecyclerView.ViewHolder(binding.root)
 
+    // Inflate item layout
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding = ItemCategoryBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
@@ -24,6 +34,7 @@ class CategoryAdapter(
         return CategoryViewHolder(binding)
     }
 
+    // Bind data to views
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val category = categories[position]
         with(holder.binding) {
@@ -37,13 +48,13 @@ class CategoryAdapter(
 
     override fun getItemCount() = categories.size
 
+    // Update list data
     fun submitList(newList: List<Category>) {
         categories = newList
         notifyDataSetChanged()
     }
 
-    fun getItemAt(position: Int): Category {
-        return categories[position]
-    }
+    // Get item by position
+    fun getItemAt(position: Int): Category = categories[position]
 
 }

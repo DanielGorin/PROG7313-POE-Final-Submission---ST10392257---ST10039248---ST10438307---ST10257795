@@ -1,3 +1,11 @@
+// Takudzwa Murwira – ST10392257, Jason Daniel Isaacs – ST10039248, Daniel Gorin – ST10438307 and Moegammad-Yaseen Salie – ST10257795
+//PROG7313
+
+//References:
+//            https://medium.com/@SeanAT19/how-to-use-mpandroidchart-in-android-studio-c01a8150720f
+//            https://chatgpt.com/
+//            https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8SmtMNw34wvYkqj45rV1d3
+//            https://www.youtube.com/playlist?list=PLSrm9z4zp4mEPOfZNV9O-crOhoMa0G2-o
 package vcmsa.projects.pcv1.ui.expenses
 
 import android.app.DatePickerDialog
@@ -17,7 +25,8 @@ import vcmsa.projects.pcv1.util.SessionManager
 import java.util.*
 
 class AddExpenseFragment : Fragment() {
-
+    // View binding and repository/session declarations
+    // Variables for tracking current user, selected date/time, photo, and category
     private var _binding: FragmentAddExpenseBinding? = null
     private val binding get() = _binding!!
     private lateinit var expenseRepository: ExpenseRepository
@@ -36,7 +45,11 @@ class AddExpenseFragment : Fragment() {
             binding.imagePreview.setImageURI(it)
         }
     }
-
+    /**
+     * Inflate the layout, initialize session and repositories,
+     * setup category spinner, date/time pickers, and image picker,
+     * and bind the save button click listener.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -56,7 +69,11 @@ class AddExpenseFragment : Fragment() {
 
         return binding.root
     }
-
+    /**
+     * Load categories from the database and populate the spinner,
+     * including option to add a new category.
+     * Handle spinner item selection and updating selectedCategoryId.
+     */
     private fun setupCategorySpinner(preselectId: Int? = null) {
         lifecycleScope.launch {
             currentCategories = categoryRepository.getCategoriesForUser(currentUserId)
@@ -86,6 +103,11 @@ class AddExpenseFragment : Fragment() {
             }
         }
     }
+    /**
+     * Display a dialog for the user to add a new category,
+     * with inputs for name and optional icon.
+     * Adds the new category to the database on confirmation and reloads spinner.
+     */
 
     private fun showAddCategoryDialog() {
         val layout = LinearLayout(requireContext()).apply {
@@ -131,7 +153,10 @@ class AddExpenseFragment : Fragment() {
             .show()
     }
 
-
+    /**
+     * Setup listeners for date and time input fields,
+     * showing dialogs to pick date, start time, and end time.
+     */
     private fun setupDateTimePickers() {
         val calendar = Calendar.getInstance()
 
@@ -158,7 +183,11 @@ class AddExpenseFragment : Fragment() {
             }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
         }
     }
-
+    /**
+     * Calculate the timestamp (milliseconds since epoch) based on
+     * provided date and time strings.
+     * Returns current time if parsing fails.
+     */
     private fun calculateTimestamp(date: String, time: String): Long {
         return try {
             val parts = date.split("-")
@@ -180,13 +209,19 @@ class AddExpenseFragment : Fragment() {
             System.currentTimeMillis()
         }
     }
-
+    /**
+     * Setup the image picker button to launch image selection intent.
+     */
     private fun setupImagePicker() {
         binding.btnAttachPhoto.setOnClickListener {
             imagePicker.launch("image/*")
         }
     }
-
+    /**
+     * Validate input fields and save the expense record to the database.
+     * Show appropriate error messages for invalid inputs.
+     * On success, show confirmation toast and navigate back.
+     */
     private fun saveExpense() {
         val amount = binding.editAmount.text.toString().toDoubleOrNull()
         val description = binding.editDescription.text.toString().ifBlank { null }
@@ -229,7 +264,9 @@ class AddExpenseFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
     }
-
+    /**
+     * Clear binding reference when the view is destroyed to avoid memory leaks.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

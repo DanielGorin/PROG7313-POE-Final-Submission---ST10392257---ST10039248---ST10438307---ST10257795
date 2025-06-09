@@ -20,7 +20,10 @@ class ExpenseAdapter(
 
     val currentCategoryMap: Map<Int, String>
         get() = categoryMap
-
+    /**
+     * ViewHolder class that holds and binds the expense item views.
+     * Responsible for populating each expense item UI with data.
+     */
     inner class ExpenseViewHolder(private val binding: ItemExpenseBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -56,16 +59,25 @@ class ExpenseAdapter(
             }
         }
     }
-
+    /**
+     * Inflates the item layout and creates the ViewHolder instance.
+     * Called when RecyclerView needs a new ViewHolder.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpenseViewHolder {
         val binding = ItemExpenseBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ExpenseViewHolder(binding)
     }
-
+    /**
+     * Binds the expense data at the given position to the ViewHolder.
+     * Called by RecyclerView to display data in the ViewHolder.
+     */
     override fun onBindViewHolder(holder: ExpenseViewHolder, position: Int) {
         holder.bind(expenses[position])
     }
-
+    /**
+     * Returns the total number of expense items.
+     * Called by RecyclerView to determine how many items to display.
+     */
     override fun getItemCount(): Int = expenses.size
 
     fun updateData(newExpenses: List<Expense>, newCategoryMap: Map<Int, String>) {

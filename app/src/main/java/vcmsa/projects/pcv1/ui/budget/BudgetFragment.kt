@@ -1,3 +1,11 @@
+// Takudzwa Murwira – ST10392257, Jason Daniel Isaacs – ST10039248, Daniel Gorin – ST10438307 and Moegammad-Yaseen Salie – ST10257795
+//PROG7313
+
+//References:
+//            https://medium.com/@SeanAT19/how-to-use-mpandroidchart-in-android-studio-c01a8150720f
+//            https://chatgpt.com/
+//            https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8SmtMNw34wvYkqj45rV1d3
+//            https://www.youtube.com/playlist?list=PLSrm9z4zp4mEPOfZNV9O-crOhoMa0G2-o
 package vcmsa.projects.pcv1.ui.budget
 
 import android.animation.ObjectAnimator
@@ -280,7 +288,7 @@ class BudgetFragment : Fragment() {
 
 
 
-
+    // Show prompt dialog to ask user how much to splurge or save
     private fun showSplurgePrompt() {
         val input = EditText(requireContext()).apply {
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
@@ -311,7 +319,7 @@ class BudgetFragment : Fragment() {
             .setNegativeButton("Cancel", null)
             .show()
     }
-
+    // Animate coin flip to randomly decide whether to splurge or save
     private fun startCoinFlipAnimation(amount: Double, remaining: Double) {
         val coinImage = binding.coinFlipImage
         val choice = binding.coinTextView
@@ -320,7 +328,7 @@ class BudgetFragment : Fragment() {
 
 
 
-
+        // Rotate the coin 720 degrees (2 full spins)
         val animator = ObjectAnimator.ofFloat(coinImage, View.ROTATION_Y, 0f, 1800f).apply {
             duration = 5000
             interpolator = LinearInterpolator()
@@ -354,7 +362,7 @@ class BudgetFragment : Fragment() {
         val chanceToSpend = (1.0 - ratio).coerceIn(0.05, 0.95)
         return Math.random() < chanceToSpend
     }
-
+    // Clear binding reference on destroy view to avoid memory leaks
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

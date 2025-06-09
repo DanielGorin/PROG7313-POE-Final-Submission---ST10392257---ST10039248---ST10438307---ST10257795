@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,17 +21,16 @@ import vcmsa.projects.pcv1.data.ExpenseWithCategoryName
 import vcmsa.projects.pcv1.databinding.FragmentHomeBinding
 import vcmsa.projects.pcv1.util.SessionManager
 import androidx.core.graphics.toColorInt
-import androidx.navigation.fragment.findNavController
-import vcmsa.projects.pcv1.R
 
 class HomeFragment : Fragment() {
-
+    // View binding instance for this fragment's layout
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-
+    // ViewModel instance for managing UI data
     private lateinit var viewModel: HomeViewModel
+    // Holds the current budget status as a color category string ("green", "yellow", "red")
     private lateinit var budgetStatus: String
-
+    // Lists of budget tips corresponding to different budget statuses
     private val greenTips = listOf(
         "Remember things at home are often cheaper, try making your own coffee and lunch this week.",
         "Use a shopping list, this helps stop impulse purchases.",
@@ -62,26 +60,25 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // Inflate the layout using view binding
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         val context = requireContext()
         val sessionManager = SessionManager(context)
-        val userId = sessionManager.getUserId()
-        val username = sessionManager.getUsername()
+        val userId = sessionManager.getUserId()// Retrieve current logged-in user's ID
+        val username = sessionManager.getUsername()// Retrieve username
 
         binding.textWelcome.text = "Welcome, $username!"
 
-
+        // Initialize ViewModel using factory with DAOs and userId
         val appDatabase = AppDatabase.getInstance(context)
         viewModel = ViewModelProvider(
             this,
             HomeViewModelFactory(appDatabase.expenseDao(), appDatabase.budgetDao(), userId)
         )[HomeViewModel::class.java]
-
-        setupButtonClickListeners()
+        // Observe LiveData from ViewModel to update UI reactively
         observeViewModel()
-
-
+        // Set up button click to show a random tip based on budget status
         binding.btnTips.setOnClickListener {
             val tip = getRandomTip(budgetStatus)
             AlertDialog.Builder(requireContext())
@@ -93,64 +90,32 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
-
+    // Observe LiveData from ViewModel and update UI accordingly
     private fun observeViewModel() {
+        // Observe expenses for the current month grouped with category names
         viewModel.currentMonthExpensesWithCategory.observe(viewLifecycleOwner) { expenses ->
             val totalSpent = expenses.sumOf { it.amount }
+            // Update summary text to show total spent
             binding.textBudgetSummary.text = "Spent: R$totalSpent"
-
+            // Get the current budget from LiveData
             val budget = viewModel.currentBudget.value
             if (budget != null) {
                 updateProgressBar(totalSpent, budget.minAmount, budget.maxAmount)
             }
-
+            // Setup the pie chart to visualize expenses by category
             setupPieChart(expenses)
         }
-
+        // Observe current budget changes
         viewModel.currentBudget.observe(viewLifecycleOwner) { budget ->
             val expenses = viewModel.currentMonthExpensesWithCategory.value
             val totalSpent = expenses?.sumOf { it.amount } ?: 0.0
 
             if (budget != null) {
+                // Update progress bar and budget status when budget changes
                 updateProgressBar(totalSpent, budget.minAmount, budget.maxAmount)
             }
         }
     }
-
-    private fun setupButtonClickListeners() {
-        binding.btnTips.setOnClickListener {
-            val tip = getRandomTip(budgetStatus)
-            AlertDialog.Builder(requireContext())
-                .setTitle("Budget Tip")
-                .setMessage(tip)
-                .setPositiveButton("OK", null)
-                .show()
-        }
-
-        binding.btnAddExpense.setOnClickListener {
-
-            findNavController().navigate(R.id.action_homeFragment_to_addExpenseFragment)
-            Log.d("HomeFragment", "Add Expense button clicked")
-
-        }
-
-        binding.btnViewCategories.setOnClickListener {
-
-            findNavController().navigate(R.id.action_homeFragment_to_categoriesFragment)
-            Log.d("HomeFragment", "View Categories button clicked")
-        }
-
-        binding.btnViewExpenses.setOnClickListener {
-
-            findNavController().navigate(R.id.action_homeFragment_to_allExpensesFragment)
-            Log.d("HomeFragment", "View All Expenses button clicked")
-        }
-
-        binding.btnBudgetSettings.setOnClickListener {
-
-            findNavController().navigate(R.id.action_homeFragment_to_budgetSettingsFragment)
-            Log.d("HomeFragment", "Budget Settings button clicked")
-        }}
 
     private fun updateProgressBar(totalSpent: Double, min: Double, max: Double) {
         val percentage = ((totalSpent / max) * 100).coerceIn(0.0, 100.0).toInt()
@@ -167,10 +132,7 @@ class HomeFragment : Fragment() {
             start()
         }
 
-
-
-
-            // Update progress color
+        // Update progress color
         val color = getBudgetColor(totalSpent, min, max)
         binding.progressBudget.setIndicatorColor(color)
 

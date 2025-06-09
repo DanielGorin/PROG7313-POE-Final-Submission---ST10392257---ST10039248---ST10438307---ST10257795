@@ -22,10 +22,11 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         repo = UserRepository(AppDatabase.getInstance(this).userDao())
         session = SessionManager(this)
-
+        // Handle login button click
         binding.btnSubmit.setOnClickListener {
             val username = binding.etUsername.text.toString().trim()
             val password = binding.etPassword.text.toString()
+            // Basic input check
             if (username.isEmpty() || password.isEmpty()) return@setOnClickListener
 
             lifecycleScope.launch {

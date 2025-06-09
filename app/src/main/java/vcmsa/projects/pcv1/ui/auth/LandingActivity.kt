@@ -15,16 +15,18 @@ class LandingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLandingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // Initialize session manager
         session = SessionManager(this)
-
+        // Skip landing if user is already logged in
         if (session.isLoggedIn()) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
-
+        // Navigate to Register screen
         binding.btnRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+        // Navigate to Login screen
         binding.btnLogin.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }

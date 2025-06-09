@@ -17,13 +17,17 @@ import vcmsa.projects.pcv1.databinding.FragmentExpenseDetailBinding
 
 
 class ExpenseDetailFragment : Fragment() {
-
+    // View Binding reference for accessing layout views
     private var _binding: FragmentExpenseDetailBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var expenseRepository: ExpenseRepository
     private var expenseId: Int = -1
     private var currentExpense: Expense? = null
+    /**
+     * Called when the Fragment is being created.
+     * Retrieves the expenseId passed as an argument to this Fragment.
+     */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +35,10 @@ class ExpenseDetailFragment : Fragment() {
             expenseId = it.getInt("expenseId")
         }
     }
-
+    /**
+     * Called to inflate the Fragment's view.
+     * Uses View Binding to inflate the layout and set up the binding object.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,7 +46,11 @@ class ExpenseDetailFragment : Fragment() {
         _binding = FragmentExpenseDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
-
+    /**
+     * Called after the view has been created.
+     * Initializes the ExpenseRepository, loads the expense data asynchronously,
+     * and sets up click listeners for Delete and Edit buttons.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val db = AppDatabase.getInstance(requireContext())
