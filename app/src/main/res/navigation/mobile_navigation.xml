@@ -9,7 +9,21 @@
         android:id="@+id/navigation_home"
         android:name="vcmsa.projects.pcv1.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+
+        <action
+            android:id="@+id/action_homeFragment_to_addExpenseFragment"
+            app:destination="@id/addExpenseFragment"/>
+        <action
+            android:id="@+id/action_homeFragment_to_categoriesFragment"
+            app:destination="@id/navigation_category"/>
+        <action
+            android:id="@+id/action_homeFragment_to_allExpensesFragment"
+            app:destination="@id/navigation_expenses"/>
+        <action
+            android:id="@+id/action_homeFragment_to_budgetSettingsFragment"
+            app:destination="@id/navigation_budget"/>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_category"

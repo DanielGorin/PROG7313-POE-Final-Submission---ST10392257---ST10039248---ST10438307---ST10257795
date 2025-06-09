@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,8 @@ import vcmsa.projects.pcv1.data.ExpenseWithCategoryName
 import vcmsa.projects.pcv1.databinding.FragmentHomeBinding
 import vcmsa.projects.pcv1.util.SessionManager
 import androidx.core.graphics.toColorInt
+import androidx.navigation.fragment.findNavController
+import vcmsa.projects.pcv1.R
 
 class HomeFragment : Fragment() {
 
@@ -75,7 +78,9 @@ class HomeFragment : Fragment() {
             HomeViewModelFactory(appDatabase.expenseDao(), appDatabase.budgetDao(), userId)
         )[HomeViewModel::class.java]
 
+        setupButtonClickListeners()
         observeViewModel()
+
 
         binding.btnTips.setOnClickListener {
             val tip = getRandomTip(budgetStatus)
@@ -112,6 +117,41 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun setupButtonClickListeners() {
+        binding.btnTips.setOnClickListener {
+            val tip = getRandomTip(budgetStatus)
+            AlertDialog.Builder(requireContext())
+                .setTitle("Budget Tip")
+                .setMessage(tip)
+                .setPositiveButton("OK", null)
+                .show()
+        }
+
+        binding.btnAddExpense.setOnClickListener {
+
+            findNavController().navigate(R.id.action_homeFragment_to_addExpenseFragment)
+            Log.d("HomeFragment", "Add Expense button clicked")
+
+        }
+
+        binding.btnViewCategories.setOnClickListener {
+
+            findNavController().navigate(R.id.action_homeFragment_to_categoriesFragment)
+            Log.d("HomeFragment", "View Categories button clicked")
+        }
+
+        binding.btnViewExpenses.setOnClickListener {
+
+            findNavController().navigate(R.id.action_homeFragment_to_allExpensesFragment)
+            Log.d("HomeFragment", "View All Expenses button clicked")
+        }
+
+        binding.btnBudgetSettings.setOnClickListener {
+
+            findNavController().navigate(R.id.action_homeFragment_to_budgetSettingsFragment)
+            Log.d("HomeFragment", "Budget Settings button clicked")
+        }}
+
     private fun updateProgressBar(totalSpent: Double, min: Double, max: Double) {
         val percentage = ((totalSpent / max) * 100).coerceIn(0.0, 100.0).toInt()
 
@@ -127,7 +167,10 @@ class HomeFragment : Fragment() {
             start()
         }
 
-        // Update progress color
+
+
+
+            // Update progress color
         val color = getBudgetColor(totalSpent, min, max)
         binding.progressBudget.setIndicatorColor(color)
 

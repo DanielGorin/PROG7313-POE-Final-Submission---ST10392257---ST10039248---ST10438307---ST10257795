@@ -115,21 +115,21 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
+            android:visibility="gone"
             app:alignmentMode="alignMargins"
             app:columnCount="2"
             app:columnOrderPreserved="false"
-            app:layout_constraintTop_toBottomOf="@id/pieChart"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pieChart"
             app:rowCount="2">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                app:cardElevation="4dp"
                 app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
@@ -138,21 +138,21 @@
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:backgroundTint="?attr/colorPrimary"
                     android:text="Add Expense"
+                    android:textColor="@color/white"
                     app:icon="@drawable/ic_add"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
-                    app:iconTint="@color/white"
-                    android:textColor="@color/white"
-                    android:backgroundTint="?attr/colorPrimary" />
+                    app:iconTint="@color/white" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                app:cardElevation="4dp"
                 app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
@@ -161,21 +161,21 @@
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="?attr/colorPrimary"
                     android:text="View Categories"
+                    android:textColor="@color/white"
                     app:icon="@drawable/ic_category"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
-                    app:iconTint="@color/white"
-                    android:textColor="@color/white"
-                    android:backgroundTint="?attr/colorPrimary" />
+                    app:iconTint="@color/white" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                app:cardElevation="4dp"
                 app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
@@ -184,21 +184,21 @@
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:backgroundTint="?attr/colorPrimary"
                     android:text="View All Expenses"
+                    android:textColor="@color/white"
                     app:icon="@drawable/ic_list_24"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
-                    app:iconTint="@color/white"
-                    android:textColor="@color/white"
-                    android:backgroundTint="?attr/colorPrimary" />
+                    app:iconTint="@color/white" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                app:cardElevation="4dp"
                 app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
@@ -207,13 +207,13 @@
                     style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="?attr/colorPrimary"
                     android:text="Budget Settings"
+                    android:textColor="@color/white"
                     app:icon="@drawable/ic_budget_24"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
-                    app:iconTint="@color/white"
-                    android:textColor="@color/white"
-                    android:backgroundTint="?attr/colorPrimary" />
+                    app:iconTint="@color/white" />
             </com.google.android.material.card.MaterialCardView>
 
         </androidx.gridlayout.widget.GridLayout>
@@ -223,15 +223,15 @@
             android:id="@+id/textMotivation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="“Small savings today, big rewards tomorrow.”"
-            android:textStyle="italic"
-            android:textAlignment="center"
-            app:layout_constraintTop_toBottomOf="@id/buttonGrid"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:paddingBottom="20dp"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="30dp"/>
+            android:paddingBottom="20dp"
+            android:text="“Small savings today, big rewards tomorrow.”"
+            android:textAlignment="center"
+            android:textStyle="italic"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonGrid" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
