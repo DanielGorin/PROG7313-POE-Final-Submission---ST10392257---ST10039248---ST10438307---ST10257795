@@ -5,18 +5,17 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:background="#FFFFFF">
+    android:padding="24dp">
 
     <TextView
         android:id="@+id/tvAppTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
         android:text="PocketChange"
-        android:textSize="28sp"
-        android:textStyle="bold"
         android:textColor="#2E7D32"
-        android:layout_marginBottom="48dp" />
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/btnRegister"

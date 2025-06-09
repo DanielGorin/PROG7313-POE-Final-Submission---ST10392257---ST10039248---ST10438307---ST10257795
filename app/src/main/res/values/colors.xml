@@ -9,5 +9,33 @@
     <color name="white">#FFFFFFFF</color>
     <color name="circle_background">#878787</color>
     <color name="dark_gray">#FF444444</color>
-    <color name="green">#FF00FF00</color>"
+    <color name="green">#FF00FF00</color>
+
+    <color name="Fortune_Blue">#1D4E89</color>
+    <color name="Gold_Accent">#F4C542</color>
+    <color name="Misty_White">#F9FAFB</color>
+    <color name="Soft_Blue_Gray">#E3EFFE</color>
+    <color name="Dark_Navy">#122B40</color>
+    <color name="Steel_Gray">#4F5B67</color>
+    <color name="Jade_Green">#2DCCA7</color>
+
+    <color name="Fortune_Navy">#26658c</color>
+    <color name="Gold_Coin">#F4C542</color>
+    <color name="Midnight_Ink">#2c3639</color>
+    <color name="Graphite_Blue">#1A1F2B</color>
+    <color name="Emerald_Green">#2DCCA7</color>
+    <color name="Slate_Line">#2C2F36</color>
+    <color name="Soft_White">#F5F7FA</color>
+    <color name="Cloud_Gray">#AEB4C0</color>
+
+
+    <color name="background_dark">#0F1115</color> <!-- Midnight Ink -->
+    <color name="surface_dark">#1A1F2B</color>   <!-- Card or content surfaces -->
+    <color name="on_background_dark">#F5F7FA</color> <!-- Text on background -->
+
+
+    <color name="Snow_White">#f0eef2</color>
+    <color name="bot_nav">#e0e0e0</color>
+    <color name="Light_Surface">#F5F7FA</color>
+    <color name="On_Light_Text">#0D1B2A</color>
 </resources>

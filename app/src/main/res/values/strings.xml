@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PCv1</string>
+    <string name="app_name">PocketChange</string>
     <string name="title_home">Home</string>
     <string name="title_category">Category</string>
     <string name="title_budget">Budget</string>
