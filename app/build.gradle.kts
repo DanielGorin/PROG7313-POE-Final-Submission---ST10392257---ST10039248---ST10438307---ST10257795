@@ -58,6 +58,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation ("com.google.android.material:material:1.10.0")
+    implementation ("androidx.gridlayout:gridlayout:1.0.0")
     implementation ("androidx.room:room-runtime:2.6.1")
     kapt ("androidx.room:room-compiler:2.6.1") //remove sync then add after sync and sync again
 

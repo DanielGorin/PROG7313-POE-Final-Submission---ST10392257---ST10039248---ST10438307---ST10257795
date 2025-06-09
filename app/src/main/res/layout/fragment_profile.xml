@@ -49,27 +49,7 @@
             android:textSize="18sp"
             android:layout_marginTop="12dp" />
 
-        <Button
-            android:id="@+id/btn_remove_picture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Remove Picture"
-            android:layout_marginTop="8dp" />
 
-        <!-- Edit Profile -->
-        <Button
-            android:id="@+id/btn_edit_profile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Edit Profile"
-            android:layout_marginTop="24dp" />
-
-        <!-- Change Password -->
-        <Button
-            android:id="@+id/btn_change_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Change Password" />
 
         <!-- App Version and Privacy Policy -->
         <LinearLayout
@@ -117,8 +97,10 @@
             android:id="@+id/btn_logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Logout"
             android:layout_marginTop="24dp"
-            android:textColor="@android:color/holo_red_dark" />
+
+            android:backgroundTint="@color/design_default_color_error"
+            android:text="Logout"
+            android:textColor="@color/Misty_White" />
     </LinearLayout>
 </ScrollView>

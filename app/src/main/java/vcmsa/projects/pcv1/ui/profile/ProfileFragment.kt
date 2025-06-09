@@ -7,8 +7,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.activity
 import kotlinx.coroutines.launch
 import vcmsa.projects.pcv1.R
 import vcmsa.projects.pcv1.data.AppDatabase
@@ -17,6 +19,7 @@ import vcmsa.projects.pcv1.databinding.FragmentProfileBinding
 import vcmsa.projects.pcv1.ui.auth.LandingActivity
 import vcmsa.projects.pcv1.util.DarkModeManager
 import vcmsa.projects.pcv1.util.SessionManager
+import androidx.core.net.toUri
 
 class ProfileFragment : Fragment() {
 
@@ -67,6 +70,10 @@ class ProfileFragment : Fragment() {
         val username = session.getUsername() ?: "User"
         binding.textUsername.text = username
 
+
+        binding.btnContactUs.setOnClickListener { // Access button directly via binding
+            sendEmail()
+        }
         lifecycleScope.launch {
             val uriString = repo.getProfileImage(currentUserId)
             if (!uriString.isNullOrEmpty()) {
@@ -107,6 +114,27 @@ class ProfileFragment : Fragment() {
         binding.textProfileInitial.text = username.firstOrNull()?.uppercase() ?: "?"
         binding.textProfileInitial.visibility = View.VISIBLE
     }
+
+    private fun sendEmail() {
+        val recipientEmail = "st10392257@vcconnect.edu.za" // **REPLACE THIS**
+        val subject = "Contact Us Feedback"
+        // val body = "Hello..."
+
+        val mailto = "mailto:" + Uri.encode(recipientEmail) +
+                "?subject=" + Uri.encode(subject)
+        // + "&body=" + Uri.encode(body)
+
+        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+            data = mailto.toUri()
+        }
+
+        if (activity?.packageManager?.resolveActivity(emailIntent, 0) != null) {
+            startActivity(emailIntent)
+        } else {
+            Toast.makeText(context, "No email app found.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

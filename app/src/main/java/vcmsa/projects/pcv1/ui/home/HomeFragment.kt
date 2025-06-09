@@ -1,6 +1,7 @@
 package vcmsa.projects.pcv1.ui.home
 
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,6 +20,7 @@ import vcmsa.projects.pcv1.data.AppDatabase
 import vcmsa.projects.pcv1.data.ExpenseWithCategoryName
 import vcmsa.projects.pcv1.databinding.FragmentHomeBinding
 import vcmsa.projects.pcv1.util.SessionManager
+import androidx.core.graphics.toColorInt
 
 class HomeFragment : Fragment() {
 
@@ -66,6 +68,7 @@ class HomeFragment : Fragment() {
 
         binding.textWelcome.text = "Welcome, $username!"
 
+
         val appDatabase = AppDatabase.getInstance(context)
         viewModel = ViewModelProvider(
             this,
@@ -112,18 +115,23 @@ class HomeFragment : Fragment() {
     private fun updateProgressBar(totalSpent: Double, min: Double, max: Double) {
         val percentage = ((totalSpent / max) * 100).coerceIn(0.0, 100.0).toInt()
 
+        val currentProgress = binding.progressBudget.progress
+        binding.textProgressPercentage.text = "$percentage%"
+
         binding.progressBudget.max = 100
 
-        ObjectAnimator.ofInt(binding.progressBudget, "progress", percentage).apply {
-            duration = 500
+        // Animate the circular progress
+        ObjectAnimator.ofInt(binding.progressBudget, "progress", currentProgress, percentage).apply {
+            duration = 1000
             interpolator = DecelerateInterpolator()
             start()
         }
 
+        // Update progress color
         val color = getBudgetColor(totalSpent, min, max)
-        val drawable = DrawableCompat.wrap(binding.progressBudget.progressDrawable.mutate())
-        DrawableCompat.setTint(drawable, color)
-        binding.progressBudget.progressDrawable = drawable
+        binding.progressBudget.setIndicatorColor(color)
+
+        binding.textBudgetSummary.text = "Spent: R${String.format("%.2f", totalSpent)} of R${String.format("%.2f", max)}"
 
         binding.textBudgetStatus.text = when {
             totalSpent < min -> {
@@ -141,17 +149,19 @@ class HomeFragment : Fragment() {
         }
     }
 
+
+
     private fun getBudgetColor(totalSpent: Double, min: Double, max: Double): Int {
         return when {
             totalSpent < min -> {
                 val fraction = (totalSpent / min).coerceIn(0.0, 1.0)
-                interpolateColor(Color.parseColor("#4CAF50"), Color.parseColor("#FFA500"), fraction)
+                interpolateColor("#4CAF50".toColorInt(), "#FFA500".toColorInt(), fraction)
             }
             totalSpent in min..max -> {
                 val fraction = ((totalSpent - min) / (max - min)).coerceIn(0.0, 1.0)
-                interpolateColor(Color.parseColor("#FFA500"), Color.parseColor("#FF8C00"), fraction)
+                interpolateColor("#FFA500".toColorInt(), "#FF8C00".toColorInt(), fraction)
             }
-            else -> Color.parseColor("#8B0000")
+            else -> "#8B0000".toColorInt()
         }
     }
 
@@ -182,6 +192,25 @@ class HomeFragment : Fragment() {
             else -> "Track your expenses daily to stay on top of your budget!"
         }
     }
+
+    private fun animateProgressSmoothly(from: Int, to: Int) {
+        val animator = ObjectAnimator.ofInt(binding.progressBudget, "progress", from, to)
+        animator.duration = 1000 // Slower for loader feel
+        animator.interpolator = DecelerateInterpolator()
+        animator.start()
+    }
+
+    private fun animateBudgetText(from: Int, to: Int) {
+        val animator = ValueAnimator.ofInt(from, to)
+        animator.duration = 1000
+        animator.addUpdateListener {
+            val value = it.animatedValue as Int
+            binding.textBudgetSummary.text = "Spent: R$value"
+        }
+        animator.start()
+    }
+
+
 
     private fun setupPieChart(expenses: List<ExpenseWithCategoryName>) {
         val grouped = expenses.groupBy { it.categoryName ?: "Uncategorized" }

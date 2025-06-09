@@ -17,8 +17,8 @@
         <item name="colorOnBackground">@color/on_background_dark</item>
         <item name="colorOnSurface">@color/on_background_dark</item>
 
-        <item name="android:fontFamily">@font/manrope_medium</item>
-        <item name="fontFamily">@font/manrope_medium</item>
+        <item name="android:fontFamily">@font/ubuntu_medium</item>
+        <item name="fontFamily">@font/ubuntu_medium</item>
         <!-- Status bar -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 
