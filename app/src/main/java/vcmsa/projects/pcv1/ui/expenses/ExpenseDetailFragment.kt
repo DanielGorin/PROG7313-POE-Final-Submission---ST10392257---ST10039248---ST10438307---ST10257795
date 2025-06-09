@@ -17,7 +17,7 @@ import vcmsa.projects.pcv1.databinding.FragmentExpenseDetailBinding
 
 
 class ExpenseDetailFragment : Fragment() {
-    // View Binding reference for accessing layout views
+    // View Binding reference for the accessing layout views
     private var _binding: FragmentExpenseDetailBinding? = null
     private val binding get() = _binding!!
 
