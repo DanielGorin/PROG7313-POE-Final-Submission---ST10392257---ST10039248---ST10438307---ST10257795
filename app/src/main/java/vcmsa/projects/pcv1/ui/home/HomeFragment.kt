@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,31 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: HomeViewModel
+    private lateinit var budgetStatus: String
+
+    private val greenTips = listOf(
+        "Remember things at home are often cheaper, try making your own coffee and lunch this week.",
+        "Use a shopping list, this helps stop impulse purchases.",
+        "Try a cash-only day, it will make you rethink your expenses.",
+        "Take time to think about big expenses, impulses often go away after 10 minutes.",
+        "Try making a lift club for your common trips, this can save on petrol and transport."
+    )
+
+    private val yellowTips = listOf(
+        "Subscriptions and automated payments can build up. Review yours to see where you can save.",
+        "Try only eating at home this week.",
+        "Buying in bulk can lead to big savings.",
+        "Try meal prepping this week to reduce costs and improve nutrition.",
+        "Go through your pantry—cooking with staples can reduce food costs."
+    )
+
+    private val redTips = listOf(
+        "Consider selling unused items online for extra cash.",
+        "Try a free entertainment week—no spending on fun.",
+        "Uninstall apps that tempt you to spend, like food delivery.",
+        "Think about delaying non-urgent expenses.",
+        "Tell someone you trust about your goal to spend less—it helps accountability."
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +73,15 @@ class HomeFragment : Fragment() {
         )[HomeViewModel::class.java]
 
         observeViewModel()
+
+        binding.btnTips.setOnClickListener {
+            val tip = getRandomTip(budgetStatus)
+            AlertDialog.Builder(requireContext())
+                .setTitle("Budget Tip")
+                .setMessage(tip)
+                .setPositiveButton("OK", null)
+                .show()
+        }
 
         return binding.root
     }
@@ -77,27 +112,32 @@ class HomeFragment : Fragment() {
     private fun updateProgressBar(totalSpent: Double, min: Double, max: Double) {
         val percentage = ((totalSpent / max) * 100).coerceIn(0.0, 100.0).toInt()
 
-        // ✅ Ensure max is set for proper scaling
         binding.progressBudget.max = 100
 
-        // ✅ Animate progress change
         ObjectAnimator.ofInt(binding.progressBudget, "progress", percentage).apply {
             duration = 500
             interpolator = DecelerateInterpolator()
             start()
         }
 
-        // ✅ Set dynamic color
         val color = getBudgetColor(totalSpent, min, max)
         val drawable = DrawableCompat.wrap(binding.progressBudget.progressDrawable.mutate())
         DrawableCompat.setTint(drawable, color)
         binding.progressBudget.progressDrawable = drawable
 
-        // ✅ Budget status text
         binding.textBudgetStatus.text = when {
-            totalSpent < min -> "Below budget minimum"
-            totalSpent in min..max -> "Within budget"
-            else -> "Over budget!"
+            totalSpent < min -> {
+                budgetStatus = "green"
+                "Below budget minimum"
+            }
+            totalSpent in min..max -> {
+                budgetStatus = "yellow"
+                "Within budget"
+            }
+            else -> {
+                budgetStatus = "red"
+                "Over budget!"
+            }
         }
     }
 
@@ -111,7 +151,7 @@ class HomeFragment : Fragment() {
                 val fraction = ((totalSpent - min) / (max - min)).coerceIn(0.0, 1.0)
                 interpolateColor(Color.parseColor("#FFA500"), Color.parseColor("#FF8C00"), fraction)
             }
-            else -> Color.parseColor("#8B0000") // Over budget: Dark Red
+            else -> Color.parseColor("#8B0000")
         }
     }
 
@@ -132,6 +172,15 @@ class HomeFragment : Fragment() {
         val resultB = (startB + ((endB - startB) * fraction)).toInt()
 
         return Color.argb(resultA, resultR, resultG, resultB)
+    }
+
+    private fun getRandomTip(status: String): String {
+        return when (status.lowercase()) {
+            "green" -> greenTips.random()
+            "yellow" -> yellowTips.random()
+            "red" -> redTips.random()
+            else -> "Track your expenses daily to stay on top of your budget!"
+        }
     }
 
     private fun setupPieChart(expenses: List<ExpenseWithCategoryName>) {

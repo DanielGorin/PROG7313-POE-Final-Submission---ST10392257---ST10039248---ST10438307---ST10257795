@@ -20,10 +20,21 @@
             android:text="Welcome, User!"
             android:textAppearance="?attr/textAppearanceHeadline6"
             android:textStyle="bold"
-            android:textColor="@color/black"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnTips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Budget Tips"
+            android:src="@drawable/ic_tip"
+        app:tint="?attr/colorPrimary"
+        app:layout_constraintTop_toTopOf="@id/textWelcome"
+        app:layout_constraintBottom_toBottomOf="@id/textWelcome"
+        app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Budget Summary -->
         <TextView
@@ -58,7 +69,6 @@
             android:layout_height="wrap_content"
             android:text="Budget Status"
             android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="@color/black"
             android:textAlignment="center"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/progressBudget"
@@ -137,12 +147,12 @@
             android:text="“Small savings today, big rewards tomorrow.”"
             android:textStyle="italic"
             android:textAlignment="center"
-            android:textColor="@color/dark_gray"
             app:layout_constraintTop_toBottomOf="@id/btnBudgetSettings"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:paddingBottom="20dp"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginBottom="30dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
