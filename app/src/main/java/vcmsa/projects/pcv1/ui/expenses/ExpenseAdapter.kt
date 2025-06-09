@@ -22,7 +22,7 @@ class ExpenseAdapter(
         get() = categoryMap
     /**
      * ViewHolder class that holds and binds the expense item views.
-     * Responsible for populating each expense item UI with data.
+     * Responsible for populating each expenses item UI with data.
      */
     inner class ExpenseViewHolder(private val binding: ItemExpenseBinding) :
         RecyclerView.ViewHolder(binding.root) {
