@@ -7,13 +7,22 @@
     android:orientation="vertical"
     android:padding="24dp">
 
+    <ImageView
+        android:id="@+id/ivAppLogo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/app_name"
+        android:src="@mipmap/playstore"
+        />
+
     <TextView
         android:id="@+id/tvAppTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="48dp"
         android:text="PocketChange"
-        android:textColor="#2E7D32"
+        android:textColor="?attr/colorPrimary"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -22,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Register"
-        android:backgroundTint="#388E3C"
+        android:backgroundTint="?attr/colorPrimary"
         android:textColor="#FFFFFF"
         android:layout_marginBottom="16dp" />
 
@@ -31,6 +40,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:backgroundTint="#4CAF50"
+        android:backgroundTint="?attr/colorSecondary"
         android:textColor="#FFFFFF" />
 </LinearLayout>

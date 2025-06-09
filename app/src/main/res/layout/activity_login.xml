@@ -21,6 +21,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageView
+            android:id="@+id/ivAppLogo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/app_name"
+            android:src="@mipmap/playstore"
+            />
+
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
